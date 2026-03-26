@@ -1,5 +1,5 @@
 {
-  "name": "livematch-backend",
+  "name": "package.json",
   "version": "1.0.0",
   "description": "Backend en tiempo real para tablero de fútbol en vivo",
   "main": "server.js",
