@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LiveMatch</title>
-<!-- Socket.io cliente -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
 <style>
   :root {
@@ -14,8 +13,6 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
-
-  /* ── Layout ── */
   .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
   .logo { font-size: 18px; font-weight: 700; }
   .logo span { color: var(--accent); }
@@ -24,8 +21,6 @@
   .connecting   { background: #2a2a10; color: var(--yellow); animation: blink 1s infinite; }
   .disconnected { background: #3a0a0a; color: var(--red); }
   @keyframes blink { 50% { opacity: 0.4; } }
-
-  /* ── Pantalla de búsqueda ── */
   #screen-search { padding: 60px 20px; max-width: 620px; margin: 0 auto; }
   .search-title { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
   .search-sub { color: var(--muted); font-size: 15px; margin-bottom: 32px; }
@@ -46,8 +41,6 @@
   .badge-fin  { background: var(--surface2); color: var(--muted); }
   .badge-prox { background: #0a2a3a; color: var(--accent); }
   .no-results { color: var(--muted); text-align: center; padding: 20px 0; font-size: 15px; }
-
-  /* upcoming */
   .upcoming-section { margin-top: 24px; }
   .upcoming-title { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.8px; margin-bottom: 12px; }
   .upcoming-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -60,8 +53,6 @@
   .countdown.urgent { color: var(--green); }
   .countdown-label { font-size: 10px; color: var(--muted); margin-top: 1px; }
   .no-upcoming { text-align: center; padding: 20px 0; color: var(--muted); font-size: 13px; line-height: 1.9; }
-
-  /* ── Tablero del partido ── */
   #screen-match { display: none; }
   .back-btn { background: none; border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
   .back-btn:hover { color: var(--text); border-color: var(--accent); }
@@ -74,8 +65,6 @@
   .minute-badge { background: var(--surface2); border: 1px solid var(--border); padding: 4px 12px; border-radius: 6px; font-size: 13px; color: var(--green); font-weight: 700; }
   .competition-label { font-size: 11px; color: var(--muted); text-align: center; margin-top: 3px; }
   .main { display: grid; grid-template-columns: 1fr 300px; height: calc(100vh - 118px); }
-
-  /* ── Campo ── */
   .field-panel { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
   .field-wrap { flex: 1; background: #2d7a2d; border-radius: 12px; overflow: hidden; position: relative; min-height: 280px; }
   .anim-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
@@ -85,8 +74,6 @@
   @keyframes ti { 0%{opacity:0;top:4px} 12%{opacity:1;top:14px} 75%{opacity:1} 100%{opacity:0} }
   .card-anim { position: absolute; top: 40%; left: 50%; transform: translate(-50%,-50%); border-radius: 4px; width: 26px; height: 38px; animation: cp 2s ease-out forwards; }
   @keyframes cp { 0%{opacity:0;transform:translate(-50%,-50%) scale(0.2)} 15%{opacity:1;transform:translate(-50%,-70%) scale(1.2)} 80%{opacity:1} 100%{opacity:0;transform:translate(-50%,-130%)} }
-
-  /* ── Panel derecho ── */
   .right-panel { background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
   .tabs { display: flex; border-bottom: 1px solid var(--border); }
   .tab { flex: 1; padding: 11px 4px; text-align: center; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all 0.2s; letter-spacing: 0.4px; }
@@ -96,34 +83,25 @@
   .tab-pane.active { display: block; }
   .tab-content::-webkit-scrollbar { width: 4px; }
   .tab-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  /* ── Eventos ── */
   .event-item { display: flex; gap: 8px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid var(--border); }
   .event-item:last-child { border-bottom: none; }
   .event-min { font-size: 11px; font-weight: 700; color: var(--accent); min-width: 28px; padding-top: 2px; }
   .event-icon { font-size: 15px; min-width: 18px; }
   .event-text strong { display: block; font-size: 13px; font-weight: 600; }
   .event-text span { color: var(--muted); font-size: 11px; }
-
-  /* ── Stats ── */
   .stat-row { margin-bottom: 13px; }
   .stat-labels { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
   .stat-bar-wrap { background: rgba(255,255,255,0.07); border-radius: 4px; height: 5px; display: flex; }
   .stat-bar-h { background: var(--accent); height: 100%; border-radius: 4px 0 0 4px; transition: width 0.6s; }
   .stat-bar-a { background: var(--red); height: 100%; border-radius: 0 4px 4px 0; transition: width 0.6s; }
-
-  /* ── Lineup ── */
   .form-row { display: flex; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; gap: 8px; }
   .form-row:last-child { border-bottom: none; }
   .form-row .num { font-weight: 700; min-width: 22px; font-size: 12px; color: var(--muted); }
   .form-row .pos { font-size: 10px; color: var(--muted); min-width: 28px; text-align: right; }
-
-  /* ── H2H ── */
   .h2h-item { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; display: flex; justify-content: space-between; }
   .h2h-item:last-child { border-bottom: none; }
   .h2h-score { font-weight: 700; color: var(--accent); }
   .loading { color: var(--muted); font-size: 13px; text-align: center; padding: 30px 0; }
-
   @media (max-width: 680px) {
     .main { grid-template-columns: 1fr; }
     .right-panel { height: 300px; }
@@ -131,7 +109,7 @@
 </style>
 </head>
 <body>
-
+ 
 <div class="header">
   <div class="logo">Live<span>Match</span></div>
   <div style="display:flex;align-items:center;gap:12px">
@@ -139,8 +117,7 @@
     <button class="back-btn" id="back-btn" style="display:none" onclick="goToSearch()">← Partidos</button>
   </div>
 </div>
-
-<!-- ── Pantalla búsqueda ── -->
+ 
 <div id="screen-search">
   <div class="search-title">Partidos en vivo</div>
   <div class="search-sub">Busca un equipo, liga o selección</div>
@@ -150,8 +127,7 @@
   </div>
   <div class="results-list" id="results-list"></div>
 </div>
-
-<!-- ── Tablero partido ── -->
+ 
 <div id="screen-match">
   <div class="scorebar">
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
@@ -170,46 +146,40 @@
       <div class="competition-label" id="competition-label"></div>
     </div>
   </div>
-
+ 
   <div class="main">
     <div class="field-panel">
       <div class="field-wrap" id="field-wrap">
         <div class="anim-overlay" id="anim-overlay"></div>
         <svg id="field-svg" width="100%" height="100%" viewBox="0 0 600 420" preserveAspectRatio="xMidYMid meet">
           <rect width="600" height="420" fill="#2d7a2d"/>
-          <!-- Franjas -->
           <rect x="0"   y="0" width="60" height="420" fill="rgba(0,0,0,0.04)"/>
           <rect x="120" y="0" width="60" height="420" fill="rgba(0,0,0,0.04)"/>
           <rect x="240" y="0" width="60" height="420" fill="rgba(0,0,0,0.04)"/>
           <rect x="360" y="0" width="60" height="420" fill="rgba(0,0,0,0.04)"/>
           <rect x="480" y="0" width="60" height="420" fill="rgba(0,0,0,0.04)"/>
-          <!-- Líneas -->
           <rect x="20" y="14" width="560" height="392" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <line x1="300" y1="14" x2="300" y2="406" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <circle cx="300" cy="210" r="50" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <circle cx="300" cy="210" r="3" fill="rgba(255,255,255,0.6)"/>
-          <!-- Áreas izq -->
           <rect x="20" y="130" width="88" height="160" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <rect x="20" y="168" width="38" height="84" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <path d="M108 152 Q148 210 108 268" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
           <rect x="8" y="186" width="12" height="48" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
           <circle cx="80" cy="210" r="2.5" fill="rgba(255,255,255,0.6)"/>
-          <!-- Áreas der -->
           <rect x="492" y="130" width="88" height="160" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <rect x="542" y="168" width="38" height="84" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <path d="M492 152 Q452 210 492 268" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
           <rect x="580" y="186" width="12" height="48" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
           <circle cx="520" cy="210" r="2.5" fill="rgba(255,255,255,0.6)"/>
-          <!-- Jugadores (renderizados por JS) -->
           <g id="players-home"></g>
           <g id="players-away"></g>
-          <!-- Balón -->
           <text id="ball" x="300" y="213" font-size="13" text-anchor="middle" dominant-baseline="central">⚽</text>
         </svg>
       </div>
       <div style="font-size:11px;color:var(--muted);text-align:center" id="formation-label">Esperando alineaciones…</div>
     </div>
-
+ 
     <div class="right-panel">
       <div class="tabs">
         <div class="tab active" onclick="switchTab('eventos')">EVENTOS</div>
@@ -231,90 +201,73 @@
     </div>
   </div>
 </div>
-
+ 
 <script>
-// ─────────────────────────────────────────────────────────────────
-// CONFIGURACIÓN
-// Cambia esta URL a la dirección de tu backend cuando lo despliegues
-// ─────────────────────────────────────────────────────────────────
 const BACKEND_URL = 'https://livematch-backend-production.up.railway.app';
-
-// Estado local
+ 
 const state = {
   events: [],
   matchId: null,
+  lastQuery: '',
   homeColor: '#f5f5f5',
   awayColor: '#a50044',
 };
-
-// ── Conexión Socket.io ───────────────────────────────────────────
+ 
 const socket = io(BACKEND_URL, {
   reconnection: true,
   reconnectionDelay: 2000,
   reconnectionAttempts: Infinity,
 });
-
+ 
 socket.on('connect', () => {
   setStatus('connected', '● EN VIVO');
   socket.emit('join-lobby');
 });
 socket.on('disconnect', () => setStatus('disconnected', '✕ DESCONECTADO'));
 socket.on('connect_error', () => setStatus('connecting', 'RECONECTANDO'));
-
+ 
 function setStatus(cls, label) {
   const el = document.getElementById('conn-status');
   el.className = cls;
   el.textContent = label;
 }
-
-// ── Lista de partidos en vivo ────────────────────────────────────
+ 
+// ── CORRECCIÓN: pasar lastQuery en ambos listeners ──
 socket.on('live-matches', (matches) => {
   if (document.getElementById('screen-search').style.display !== 'none') {
-    renderResults(matches);
+    renderResults(matches, state.lastQuery);
   }
 });
-
+ 
 socket.on('search-results', (results) => {
-  renderResults(results);
+  renderResults(results, state.lastQuery);
 });
-
-// ── Eventos del partido ──────────────────────────────────────────
-socket.on('match-state', (matchData) => {
-  updateScoreboard(matchData);
-});
-
-socket.on('incident', (inc) => {
-  addEvent(inc);
-});
-
-socket.on('animation', (anim) => {
-  fireAnimation(anim);
-});
-
+ 
+socket.on('match-state', (matchData) => { updateScoreboard(matchData); });
+socket.on('incident', (inc) => { addEvent(inc); });
+socket.on('animation', (anim) => { fireAnimation(anim); });
 socket.on('score-update', (score) => {
   document.getElementById('score-home').textContent = score.home ?? '—';
   document.getElementById('score-away').textContent = score.away ?? '—';
 });
-
 socket.on('minute', (min) => {
   document.getElementById('minute-badge').textContent = min + "'";
   moveBall();
 });
-
 socket.on('match-enrichment', (data) => {
   if (data.lineups) renderLineups(data.lineups);
   if (data.stats)   renderStats(data.stats);
   if (data.h2h)     renderH2H(data.h2h);
 });
-
-// ── Contadores regresivos activos ────────────────────────────────
+ 
+// ── Contadores regresivos ────────────────────────────────────────
 let countdownTimers = [];
-
+ 
 function clearCountdowns() {
   countdownTimers.forEach(t => clearInterval(t));
   countdownTimers = [];
 }
-
+ 
 function formatCountdown(ms) {
   if (ms <= 0) return { text: '¡Ya!', urgent: true };
   const totalSec = Math.floor(ms / 1000);
@@ -326,11 +279,11 @@ function formatCountdown(ms) {
   if (h > 0) return { text: String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + 'h', urgent: false };
   return { text: String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0'), urgent: m < 10 };
 }
-
+ 
 function localTime(timestamp) {
   return new Date(timestamp * 1000).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 }
-
+ 
 function localDate(timestamp) {
   const d = new Date(timestamp * 1000);
   const today = new Date();
@@ -339,28 +292,42 @@ function localDate(timestamp) {
   if (d.toDateString() === tomorrow.toDateString()) return 'Mañana';
   return d.toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' });
 }
-
+ 
 // ── Búsqueda ─────────────────────────────────────────────────────
 function doSearch() {
   const q = document.getElementById('search-input').value.trim();
   if (!q) return;
+  state.lastQuery = q;  // guardar para usarlo en los listeners
   document.getElementById('results-list').innerHTML = '<div class="loading">Buscando…</div>';
   socket.emit('search', { query: q }, (results) => {
     renderResults(results || [], q);
   });
 }
-
+ 
 function renderResults(matches, query) {
   clearCountdowns();
   const el = document.getElementById('results-list');
-
-  const live      = matches.filter(m => m.status === 'IN_PLAY' || m.status === 'PAUSED');
-  const finished  = matches.filter(m => m.status === 'FINISHED');
-  const upcoming  = matches.filter(m => m.status === 'SCHEDULED' || m.status === 'TIMED').sort((a,b) => (a.startTimestamp||0) - (b.startTimestamp||0));
-
+  const q = query || '';
+ 
+  if (!matches || !matches.length) {
+    if (!q) { el.innerHTML = ''; return; }
+    el.innerHTML = `<div class="no-results">No se encontraron partidos para "${q}"</div>
+      <div class="no-upcoming">
+        Intenta buscar el nombre de la liga:<br>
+        <strong>Premier League · LaLiga · Champions · Serie A</strong><br><br>
+        Los partidos se muestran el mismo día que se juegan.<br>
+        Horarios Colombia: sábados y domingos 8am–4pm · martes y miércoles 2pm–4pm
+      </div>`;
+    return;
+  }
+ 
+  const live     = matches.filter(m => m.status === 'IN_PLAY' || m.status === 'PAUSED');
+  const finished = matches.filter(m => m.status === 'FINISHED');
+  const upcoming = matches.filter(m => m.status === 'SCHEDULED' || m.status === 'TIMED')
+                          .sort((a,b) => (a.startTimestamp||0) - (b.startTimestamp||0));
+ 
   let html = '';
-
-  // ── Partidos en vivo ──
+ 
   if (live.length) {
     html += live.map(m => {
       const scoreStr = (m.score.home !== null && m.score.away !== null) ? m.score.home + ' – ' + m.score.away : '– –';
@@ -373,8 +340,7 @@ function renderResults(matches, query) {
       </div>`;
     }).join('');
   }
-
-  // ── Terminados ──
+ 
   if (finished.length) {
     html += finished.map(m => {
       const scoreStr = m.score.home + ' – ' + m.score.away;
@@ -387,107 +353,84 @@ function renderResults(matches, query) {
       </div>`;
     }).join('');
   }
-
-  // ── Próximos con cuenta regresiva ──
+ 
   if (upcoming.length) {
-    html += `<div class="upcoming-section">
-      <div class="upcoming-title">⏰ Próximos partidos</div>`;
-
+    html += `<div class="upcoming-section"><div class="upcoming-title">⏰ Próximos partidos</div>`;
     upcoming.forEach((m, idx) => {
       const ts = m.startTimestamp || (m.utcDate ? Math.floor(new Date(m.utcDate).getTime()/1000) : null);
       const cardId = 'upc-' + idx;
       const cdId   = 'cd-' + idx;
       const msLeft = ts ? (ts * 1000 - Date.now()) : null;
-      const isSoon     = msLeft !== null && msLeft < 3600000;
       const isVerySoon = msLeft !== null && msLeft < 600000;
+      const isSoon     = msLeft !== null && msLeft < 3600000;
       const cardClass  = isVerySoon ? 'very-soon' : isSoon ? 'soon' : '';
-      const timeStr    = ts ? localTime(ts) : '';
-      const dateStr    = ts ? localDate(ts) : '';
-
-      let countdownHtml = '';
-      if (ts) {
-        const initial = formatCountdown(ts * 1000 - Date.now());
-        countdownHtml = `<div class="countdown-wrap">
-          <div class="countdown ${initial.urgent ? 'urgent' : ''}" id="${cdId}">${initial.text}</div>
-          <div class="countdown-label">${dateStr} · ${timeStr}</div>
-        </div>`;
-      } else {
-        countdownHtml = `<div class="countdown-wrap">
-          <div style="font-size:13px;font-weight:600;color:var(--text)">${timeStr}</div>
-          <div class="countdown-label">${dateStr}</div>
-        </div>`;
-      }
-
+      const timeStr = ts ? localTime(ts) : '';
+      const dateStr = ts ? localDate(ts) : '';
+      const initial = ts ? formatCountdown(ts * 1000 - Date.now()) : null;
+ 
       html += `<div class="upcoming-card ${cardClass}" id="${cardId}">
         <div>
           <div class="upcoming-teams">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
           <div class="upcoming-meta">${m.competition}</div>
         </div>
-        ${countdownHtml}
+        <div class="countdown-wrap">
+          ${initial
+            ? `<div class="countdown ${initial.urgent ? 'urgent' : ''}" id="${cdId}">${initial.text}</div>
+               <div class="countdown-label">${dateStr} · ${timeStr}</div>`
+            : `<div style="font-size:13px;font-weight:600;color:var(--text)">${timeStr}</div>
+               <div class="countdown-label">${dateStr}</div>`
+          }
+        </div>
       </div>`;
-
-      // Iniciar cuenta regresiva si hay timestamp
+ 
       if (ts) {
         const timer = setInterval(() => {
-          const cdEl = document.getElementById(cdId);
+          const cdEl   = document.getElementById(cdId);
           const cardEl = document.getElementById(cardId);
           if (!cdEl) { clearInterval(timer); return; }
-          const remaining = ts * 1000 - Date.now();
-          if (remaining <= 0) {
-            cdEl.textContent = '¡Iniciando!';
-            cdEl.classList.add('urgent');
-            clearInterval(timer);
-            return;
-          }
-          const fmt = formatCountdown(remaining);
+          const rem = ts * 1000 - Date.now();
+          if (rem <= 0) { cdEl.textContent = '¡Iniciando!'; cdEl.classList.add('urgent'); clearInterval(timer); return; }
+          const fmt = formatCountdown(rem);
           cdEl.textContent = fmt.text;
           cdEl.classList.toggle('urgent', fmt.urgent);
           if (cardEl) {
-            cardEl.classList.toggle('very-soon', remaining < 600000);
-            cardEl.classList.toggle('soon', remaining < 3600000 && remaining >= 600000);
+            cardEl.classList.toggle('very-soon', rem < 600000);
+            cardEl.classList.toggle('soon', rem < 3600000 && rem >= 600000);
           }
         }, 1000);
         countdownTimers.push(timer);
       }
     });
-
     html += '</div>';
   }
-
-  // ── Sin resultados ──
+ 
   if (!live.length && !finished.length && !upcoming.length) {
-    html = `<div class="no-results">No se encontraron partidos para "${query}"</div>
-    <div class="no-upcoming">
-      Intenta buscar directamente el nombre de la liga:<br>
-      <strong>Premier League · LaLiga · Champions · Serie A</strong><br><br>
-      Los partidos se muestran el mismo día que se juegan.<br>
-      Horarios Colombia: sábados y domingos 8am–4pm · martes y miércoles 2pm–4pm
-    </div>`;
+    html = `<div class="no-results">No se encontraron partidos para "${q}"</div>
+      <div class="no-upcoming">
+        Intenta buscar el nombre de la liga:<br>
+        <strong>Premier League · LaLiga · Champions · Serie A</strong><br><br>
+        Los partidos se muestran el mismo día que se juegan.<br>
+        Horarios Colombia: sábados y domingos 8am–4pm · martes y miércoles 2pm–4pm
+      </div>`;
   }
-
+ 
   el.innerHTML = html;
 }
-
+ 
 // ── Abrir partido ─────────────────────────────────────────────────
 function openMatch(match) {
   state.matchId = match.id;
   state.events = [];
-
-  // Mostrar pantalla del tablero
   document.getElementById('screen-search').style.display = 'none';
   document.getElementById('screen-match').style.display = 'block';
   document.getElementById('back-btn').style.display = 'inline-block';
-
-  // Actualizar scoreboard con datos disponibles
   updateScoreboard(match);
-
-  // Suscribirse al partido
   socket.emit('subscribe-match', {
     matchId: match.id,
     sofascoreId: match.source === 'sofascore' ? match.id : null,
   });
 }
-
+ 
 function goToSearch() {
   if (state.matchId) {
     socket.emit('unsubscribe-match', { matchId: state.matchId });
@@ -497,8 +440,7 @@ function goToSearch() {
   document.getElementById('screen-match').style.display = 'none';
   document.getElementById('back-btn').style.display = 'none';
 }
-
-// ── Actualizar marcador ───────────────────────────────────────────
+ 
 function updateScoreboard(m) {
   document.getElementById('name-home').textContent = m.homeTeam?.name || '—';
   document.getElementById('name-away').textContent = m.awayTeam?.name || '—';
@@ -506,24 +448,14 @@ function updateScoreboard(m) {
   document.getElementById('score-away').textContent = m.score?.away ?? '—';
   document.getElementById('minute-badge').textContent = m.minute ? m.minute + "'" : m.status === 'FINISHED' ? 'FIN' : '—';
   document.getElementById('competition-label').textContent = m.competition || '';
-
-  // Colores del equipo
   if (m.homeTeam?.colors?.primary) state.homeColor = '#' + m.homeTeam.colors.primary;
   if (m.awayTeam?.colors?.primary) state.awayColor = '#' + m.awayTeam.colors.primary;
 }
-
-// ── Eventos ───────────────────────────────────────────────────────
-function addEvent(inc) {
-  state.events.unshift(inc);
-  renderEvents();
-}
-
+ 
+function addEvent(inc) { state.events.unshift(inc); renderEvents(); }
+ 
 function renderEvents() {
-  const iconMap = {
-    'gol': '⚽', 'gol-en-contra': '⚽', 'tarjeta-amarilla': '🟨',
-    'tarjeta-roja': '🟥', 'cambio': '🔄', 'var': '📺',
-    'penal-fallado': '❌', 'corner': '🚩', 'atajada': '🧤',
-  };
+  const iconMap = { 'gol':'⚽','gol-en-contra':'⚽','tarjeta-amarilla':'🟨','tarjeta-roja':'🟥','cambio':'🔄','var':'📺','penal-fallado':'❌','corner':'🚩','atajada':'🧤' };
   const feed = document.getElementById('events-feed');
   if (!state.events.length) { feed.innerHTML = '<div class="loading">Esperando eventos…</div>'; return; }
   feed.innerHTML = state.events.map(e => `
@@ -532,164 +464,123 @@ function renderEvents() {
       <div class="event-icon">${iconMap[e.type] || '•'}</div>
       <div class="event-text">
         <strong>${e.player || ''}</strong>
-        <span>${e.description || e.assist ? (e.assist ? 'Asistencia: '+e.assist : '') : ''}</span>
+        <span>${e.assist ? 'Asistencia: '+e.assist : (e.description || '')}</span>
       </div>
     </div>`).join('');
 }
-
-// ── Stats ─────────────────────────────────────────────────────────
+ 
 function renderStats(stats) {
   const el = document.getElementById('stats-content');
   if (!stats.length) { el.innerHTML = '<div class="loading">Sin estadísticas aún</div>'; return; }
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;padding:6px 0 12px;border-bottom:1px solid var(--border);margin-bottom:10px;color:var(--muted)">
-      <span style="color:var(--accent)" id="sh-home-label">LOCAL</span>
-      <span>STATS</span>
-      <span style="color:var(--red)" id="sh-away-label">VISITANTE</span>
+      <span style="color:var(--accent)">LOCAL</span><span>STATS</span><span style="color:var(--red)">VISITANTE</span>
     </div>
     ${stats.map(s => {
       const hv = parseFloat(s.homeValue) || 0;
       const av = parseFloat(s.awayValue) || 0;
-      const total = hv + av || 1;
-      const hp = Math.round(hv / total * 100);
-      return `
-        <div class="stat-row">
-          <div class="stat-labels">
-            <span style="color:var(--accent);font-weight:600">${s.home}</span>
-            <span style="color:var(--muted);font-size:11px">${s.label}</span>
-            <span style="color:var(--red);font-weight:600">${s.away}</span>
-          </div>
-          <div class="stat-bar-wrap">
-            <div class="stat-bar-h" style="width:${hp}%"></div>
-            <div class="stat-bar-a" style="width:${100-hp}%"></div>
-          </div>
-        </div>`;
-    }).join('')}
-  `;
+      const hp = Math.round(hv / (hv + av || 1) * 100);
+      return `<div class="stat-row">
+        <div class="stat-labels">
+          <span style="color:var(--accent);font-weight:600">${s.home}</span>
+          <span style="color:var(--muted);font-size:11px">${s.label}</span>
+          <span style="color:var(--red);font-weight:600">${s.away}</span>
+        </div>
+        <div class="stat-bar-wrap">
+          <div class="stat-bar-h" style="width:${hp}%"></div>
+          <div class="stat-bar-a" style="width:${100-hp}%"></div>
+        </div>
+      </div>`;
+    }).join('')}`;
 }
-
-// ── Alineaciones ──────────────────────────────────────────────────
+ 
 function renderLineups(lineups) {
   const { home, away } = lineups;
   if (home) {
     document.getElementById('lineup-home-title').textContent = 'LOCAL · ' + (home.formation || '');
-    document.getElementById('lineup-home').innerHTML = home.players
-      .filter(p => !p.substitute)
-      .map(p => `<div class="form-row"><span class="num">${p.number}</span><span style="flex:1">${p.name}</span><span class="pos">${p.position}</span></div>`)
-      .join('');
+    document.getElementById('lineup-home').innerHTML = home.players.filter(p => !p.substitute)
+      .map(p => `<div class="form-row"><span class="num">${p.number}</span><span style="flex:1">${p.name}</span><span class="pos">${p.position}</span></div>`).join('');
     if (home.formation) renderPlayers('players-home', home.players, state.homeColor, false);
   }
   if (away) {
     document.getElementById('lineup-away-title').textContent = 'VISITANTE · ' + (away.formation || '');
-    document.getElementById('lineup-away').innerHTML = away.players
-      .filter(p => !p.substitute)
-      .map(p => `<div class="form-row"><span class="num">${p.number}</span><span style="flex:1">${p.name}</span><span class="pos">${p.position}</span></div>`)
-      .join('');
+    document.getElementById('lineup-away').innerHTML = away.players.filter(p => !p.substitute)
+      .map(p => `<div class="form-row"><span class="num">${p.number}</span><span style="flex:1">${p.name}</span><span class="pos">${p.position}</span></div>`).join('');
     if (away.formation) renderPlayers('players-away', away.players, state.awayColor, true);
   }
-  const hl = home?.formation || '';
-  const al = away?.formation || '';
+  const hl = home?.formation || '', al = away?.formation || '';
   document.getElementById('formation-label').textContent = hl || al ? `← Local ${hl}  |  ${al} Visitante →` : '';
 }
-
+ 
 function renderPlayers(groupId, players, color, flipSide) {
   const group = document.getElementById(groupId);
   const starters = players.filter(p => !p.substitute);
-
   group.innerHTML = starters.map(p => {
     let x, y;
-    // Si tenemos coords de SofaScore, las usamos directamente
     if (p.coords.x !== null && p.coords.y !== null) {
-      // SofaScore usa coordenadas 0-100 desde la perspectiva del equipo local
       x = flipSide ? 600 - (p.coords.x / 100 * 560 + 20) : p.coords.x / 100 * 560 + 20;
       y = p.coords.y / 100 * 392 + 14;
     } else {
-      // Fallback: distribuir por posición
       const posMap = { GK:[0.08,0.5], DF:[0.22,0.5], MF:[0.5,0.5], FW:[0.72,0.5] };
       const base = posMap[p.position] || [0.4, 0.5];
       x = flipSide ? (1 - base[0]) * 560 + 20 : base[0] * 560 + 20;
       y = base[1] * 392 + 14;
     }
     const stroke = color === '#f5f5f5' ? '#aaa' : '#000';
-    return `
-      <g class="player">
-        <circle cx="${x}" cy="${y}" r="11" fill="${color}" stroke="${stroke}" stroke-width="1.5"/>
-        <text x="${x}" y="${y}" font-size="9" font-weight="700" fill="rgba(0,0,0,0.7)" text-anchor="middle" dominant-baseline="central">${p.number}</text>
-        <text x="${x}" y="${y+14}" font-size="8" fill="rgba(255,255,255,0.75)" text-anchor="middle">${p.name.split(' ').pop()}</text>
-      </g>`;
+    return `<g class="player">
+      <circle cx="${x}" cy="${y}" r="11" fill="${color}" stroke="${stroke}" stroke-width="1.5"/>
+      <text x="${x}" y="${y}" font-size="9" font-weight="700" fill="rgba(0,0,0,0.7)" text-anchor="middle" dominant-baseline="central">${p.number}</text>
+      <text x="${x}" y="${y+14}" font-size="8" fill="rgba(255,255,255,0.75)" text-anchor="middle">${p.name.split(' ').pop()}</text>
+    </g>`;
   }).join('');
 }
-
-// ── H2H ───────────────────────────────────────────────────────────
+ 
 function renderH2H(matches) {
   const el = document.getElementById('h2h-content');
   if (!matches.length) { el.innerHTML = '<div class="loading">Sin historial disponible</div>'; return; }
   el.innerHTML = `<div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:0.5px;margin-bottom:10px">ÚLTIMOS ENFRENTAMIENTOS</div>` +
-    matches.map(m => `
-      <div class="h2h-item">
-        <div>${m.homeTeam.name} vs ${m.awayTeam.name}</div>
-        <div class="h2h-score">${m.score.home} – ${m.score.away}</div>
-      </div>`).join('');
+    matches.map(m => `<div class="h2h-item"><div>${m.homeTeam.name} vs ${m.awayTeam.name}</div><div class="h2h-score">${m.score.home} – ${m.score.away}</div></div>`).join('');
 }
-
-// ── Animaciones ───────────────────────────────────────────────────
+ 
 function fireAnimation(anim) {
   const overlay = document.getElementById('anim-overlay');
-
   if (anim.type === 'goal') {
-    const flash = document.createElement('div');
-    flash.className = 'goal-flash';
-    overlay.appendChild(flash);
-    setTimeout(() => flash.remove(), 1500);
+    const flash = document.createElement('div'); flash.className = 'goal-flash';
+    overlay.appendChild(flash); setTimeout(() => flash.remove(), 1500);
   }
-
   if (anim.type === 'yellow-card' || anim.type === 'red-card') {
-    const card = document.createElement('div');
-    card.className = 'card-anim';
+    const card = document.createElement('div'); card.className = 'card-anim';
     card.style.background = anim.type === 'red-card' ? '#e84040' : '#f5c518';
-    overlay.appendChild(card);
-    setTimeout(() => card.remove(), 2400);
+    overlay.appendChild(card); setTimeout(() => card.remove(), 2400);
   }
-
   const toastMessages = {
-    'goal':        { text: '⚽ ¡GOOOOOL!',          color: '#f0c040' },
-    'own-goal':    { text: '⚽ Gol en contra',       color: '#e87040' },
-    'yellow-card': { text: '🟨 Tarjeta amarilla',    color: '#f5c518' },
-    'red-card':    { text: '🟥 ¡Expulsión!',         color: '#e84040' },
-    'substitution':{ text: '🔄 Sustitución',         color: '#3ecf8e' },
-    'missed-pen':  { text: '❌ Penal fallado',        color: '#7a7f96' },
-    'var':         { text: '📺 Revisión VAR',         color: '#7a7f96' },
+    'goal':{ text:'⚽ ¡GOOOOOL!', color:'#f0c040' }, 'own-goal':{ text:'⚽ Gol en contra', color:'#e87040' },
+    'yellow-card':{ text:'🟨 Tarjeta amarilla', color:'#f5c518' }, 'red-card':{ text:'🟥 ¡Expulsión!', color:'#e84040' },
+    'substitution':{ text:'🔄 Sustitución', color:'#3ecf8e' }, 'missed-pen':{ text:'❌ Penal fallado', color:'#7a7f96' },
+    'var':{ text:'📺 Revisión VAR', color:'#7a7f96' },
   };
-
   const msg = toastMessages[anim.type];
   if (msg) {
-    const toast = document.createElement('div');
-    toast.className = 'toast';
+    const toast = document.createElement('div'); toast.className = 'toast';
     toast.innerHTML = `<strong>${msg.text}</strong>`;
     if (anim.incident?.player) toast.innerHTML += ` <span style="font-weight:400;color:var(--muted)"> ${anim.incident.player}</span>`;
     toast.style.color = msg.color;
-    overlay.appendChild(toast);
-    setTimeout(() => toast.remove(), 3500);
+    overlay.appendChild(toast); setTimeout(() => toast.remove(), 3500);
   }
 }
-
-// ── Tabs ──────────────────────────────────────────────────────────
+ 
 function switchTab(name) {
   const names = ['eventos','stats','once','h2h'];
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', names[i] === name));
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
 }
-
-// ── Balón ─────────────────────────────────────────────────────────
+ 
 function moveBall() {
   const ball = document.getElementById('ball');
-  const x = 80 + Math.random() * 440;
-  const y = 50 + Math.random() * 320;
-  ball.setAttribute('x', x);
-  ball.setAttribute('y', y);
+  ball.setAttribute('x', 80 + Math.random() * 440);
+  ball.setAttribute('y', 50 + Math.random() * 320);
 }
-
-// Mover balón suavemente cada 8s
+ 
 setInterval(moveBall, 8000);
 </script>
 </body>
