@@ -283,28 +283,52 @@ async function searchMatches(query) {
   if (cached) return cached;
 
   try {
-    // Busca en ambas fuentes en paralelo
-    const [sfResults, todayMatches] = await Promise.allSettled([
+    const apiKey = process.env.FOOTBALL_DATA_API_KEY;
+    const hasKey = apiKey && apiKey !== 'tu_clave_aqui';
+    const today  = new Date().toISOString().split('T')[0];
+
+    // Busca hoy + próximos 7 días en football-data si hay clave
+    const nextDates = hasKey ? Array.from({length: 7}, (_, i) => {
+      const d = new Date(); d.setDate(d.getDate() + i + 1);
+      return d.toISOString().split('T')[0];
+    }) : [];
+
+    const [sfResults, todayFD, ...nextFD] = await Promise.allSettled([
       sofascore.search(query),
-      process.env.FOOTBALL_DATA_API_KEY !== 'tu_clave_aqui'
-        ? footballData.getTodayMatches(process.env.FOOTBALL_DATA_API_KEY)
-        : Promise.resolve([]),
+      hasKey ? footballData.getTodayMatches(apiKey) : Promise.resolve([]),
+      ...nextDates.map(date =>
+        hasKey ? footballData.getMatchesByDate ? footballData.getMatchesByDate(apiKey, date) : Promise.resolve([]) : Promise.resolve([])
+      ),
     ]);
 
-    // Filtrar partidos de hoy que coincidan con el texto
     const q = query.toLowerCase();
-    const fdFiltered = (todayMatches.value || []).filter(m =>
-      m.homeTeam.name.toLowerCase().includes(q) ||
-      m.awayTeam.name.toLowerCase().includes(q) ||
-      m.competition.toLowerCase().includes(q)
-    );
+    const filterFn = m => m &&
+      (m.homeTeam.name.toLowerCase().includes(q) ||
+       m.awayTeam.name.toLowerCase().includes(q) ||
+       m.competition.toLowerCase().includes(q));
 
-    const results = [
-      ...(sfResults.value || []),
-      ...fdFiltered,
-    ];
+    const fdAll = [
+      ...(todayFD.value || []),
+      ...nextFD.flatMap(r => r.value || []),
+    ].filter(filterFn);
 
-    cache.set(cacheKey, results, 60); // TTL 1 min
+    // Combinar: SofaScore primero (más datos), luego football-data
+    const sfList = (sfResults.value || []).filter(Boolean);
+    const combined = [...sfList, ...fdAll];
+
+    // Separar por estado para ordenar: en vivo > terminados > próximos
+    const statusOrder = { IN_PLAY: 0, PAUSED: 0, FINISHED: 1, SCHEDULED: 2, TIMED: 2 };
+    combined.sort((a, b) => (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3));
+
+    // Deduplicar por nombre de equipos
+    const seen = new Set();
+    const results = combined.filter(m => {
+      const key = `${m.homeTeam.name}|${m.awayTeam.name}`;
+      if (seen.has(key)) return false;
+      seen.add(key); return true;
+    });
+
+    cache.set(cacheKey, results, 60);
     return results;
 
   } catch (err) {
