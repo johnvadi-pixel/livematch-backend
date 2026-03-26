@@ -45,7 +45,21 @@
   .badge-live { background: #3a0a0a; color: var(--red); }
   .badge-fin  { background: var(--surface2); color: var(--muted); }
   .badge-prox { background: #0a2a3a; color: var(--accent); }
-  .no-results { color: var(--muted); text-align: center; padding: 40px 0; font-size: 15px; }
+  .no-results { color: var(--muted); text-align: center; padding: 20px 0; font-size: 15px; }
+
+  /* upcoming */
+  .upcoming-section { margin-top: 24px; }
+  .upcoming-title { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.8px; margin-bottom: 12px; }
+  .upcoming-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .upcoming-card.soon { border-color: rgba(79,142,247,0.5); background: rgba(79,142,247,0.06); }
+  .upcoming-card.very-soon { border-color: rgba(62,207,142,0.5); background: rgba(62,207,142,0.06); }
+  .upcoming-teams { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .upcoming-meta { font-size: 11px; color: var(--muted); }
+  .countdown-wrap { text-align: right; flex-shrink: 0; min-width: 80px; }
+  .countdown { font-size: 18px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .countdown.urgent { color: var(--green); }
+  .countdown-label { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .no-upcoming { text-align: center; padding: 20px 0; color: var(--muted); font-size: 13px; line-height: 1.9; }
 
   /* ── Tablero del partido ── */
   #screen-match { display: none; }
@@ -223,8 +237,8 @@
 // CONFIGURACIÓN
 // Cambia esta URL a la dirección de tu backend cuando lo despliegues
 // ─────────────────────────────────────────────────────────────────
-const BACKEND_URL = 'https://livematch-backend-production.up.railway.app';
-  
+const BACKEND_URL = 'http://localhost:3001';
+
 // Estado local
 const state = {
   events: [],
@@ -293,41 +307,165 @@ socket.on('match-enrichment', (data) => {
   if (data.h2h)     renderH2H(data.h2h);
 });
 
+// ── Contadores regresivos activos ────────────────────────────────
+let countdownTimers = [];
+
+function clearCountdowns() {
+  countdownTimers.forEach(t => clearInterval(t));
+  countdownTimers = [];
+}
+
+function formatCountdown(ms) {
+  if (ms <= 0) return { text: '¡Ya!', urgent: true };
+  const totalSec = Math.floor(ms / 1000);
+  const d = Math.floor(totalSec / 86400);
+  const h = Math.floor((totalSec % 86400) / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (d > 0) return { text: d + 'd ' + String(h).padStart(2,'0') + 'h', urgent: false };
+  if (h > 0) return { text: String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + 'h', urgent: false };
+  return { text: String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0'), urgent: m < 10 };
+}
+
+function localTime(timestamp) {
+  return new Date(timestamp * 1000).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+}
+
+function localDate(timestamp) {
+  const d = new Date(timestamp * 1000);
+  const today = new Date();
+  const tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
+  if (d.toDateString() === today.toDateString()) return 'Hoy';
+  if (d.toDateString() === tomorrow.toDateString()) return 'Mañana';
+  return d.toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
 // ── Búsqueda ─────────────────────────────────────────────────────
 function doSearch() {
   const q = document.getElementById('search-input').value.trim();
   if (!q) return;
   document.getElementById('results-list').innerHTML = '<div class="loading">Buscando…</div>';
   socket.emit('search', { query: q }, (results) => {
-    renderResults(results || []);
+    renderResults(results || [], q);
   });
 }
 
-function renderResults(matches) {
+function renderResults(matches, query) {
+  clearCountdowns();
   const el = document.getElementById('results-list');
-  if (!matches || !matches.length) {
-    el.innerHTML = '<div class="no-results">No se encontraron partidos en este momento.<br>Intenta durante horarios de juego.</div>';
-    return;
-  }
 
-  el.innerHTML = matches.map(m => {
-    const statusLabel = m.status === 'IN_PLAY'    ? `<span class="status-badge badge-live"><span class="live-dot"></span>${m.minute ? m.minute+"'" : 'EN VIVO'}</span>`
-                      : m.status === 'FINISHED'   ? `<span class="status-badge badge-fin">FIN</span>`
-                      : m.status === 'PAUSED'     ? `<span class="status-badge badge-live">DESCANSO</span>`
-                      : `<span class="status-badge badge-prox">PRÓXIMO</span>`;
-    const scoreStr = (m.score.home !== null && m.score.away !== null)
-      ? `${m.score.home} – ${m.score.away}` : '– – –';
+  const live      = matches.filter(m => m.status === 'IN_PLAY' || m.status === 'PAUSED');
+  const finished  = matches.filter(m => m.status === 'FINISHED');
+  const upcoming  = matches.filter(m => m.status === 'SCHEDULED' || m.status === 'TIMED').sort((a,b) => (a.startTimestamp||0) - (b.startTimestamp||0));
 
-    return `
-      <div class="result-card" onclick="openMatch(${JSON.stringify(m).replace(/"/g,'&quot;')})">
+  let html = '';
+
+  // ── Partidos en vivo ──
+  if (live.length) {
+    html += live.map(m => {
+      const scoreStr = (m.score.home !== null && m.score.away !== null) ? m.score.home + ' – ' + m.score.away : '– –';
+      return `<div class="result-card" onclick="openMatch(${JSON.stringify(m).replace(/"/g,'&quot;')})">
         <div>
           <div class="result-teams">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
-          <div class="result-meta">${m.competition} · ${statusLabel}</div>
+          <div class="result-meta">${m.competition} · <span class="status-badge badge-live"><span class="live-dot"></span>${m.minute ? m.minute+"'" : 'EN VIVO'}</span></div>
         </div>
         <div class="result-score">${scoreStr}</div>
-      </div>
-    `;
-  }).join('');
+      </div>`;
+    }).join('');
+  }
+
+  // ── Terminados ──
+  if (finished.length) {
+    html += finished.map(m => {
+      const scoreStr = m.score.home + ' – ' + m.score.away;
+      return `<div class="result-card" onclick="openMatch(${JSON.stringify(m).replace(/"/g,'&quot;')})">
+        <div>
+          <div class="result-teams">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
+          <div class="result-meta">${m.competition} · <span class="status-badge badge-fin">FIN</span></div>
+        </div>
+        <div class="result-score" style="font-size:16px;color:var(--muted)">${scoreStr}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Próximos con cuenta regresiva ──
+  if (upcoming.length) {
+    html += `<div class="upcoming-section">
+      <div class="upcoming-title">⏰ Próximos partidos</div>`;
+
+    upcoming.forEach((m, idx) => {
+      const ts = m.startTimestamp || (m.utcDate ? Math.floor(new Date(m.utcDate).getTime()/1000) : null);
+      const cardId = 'upc-' + idx;
+      const cdId   = 'cd-' + idx;
+      const msLeft = ts ? (ts * 1000 - Date.now()) : null;
+      const isSoon     = msLeft !== null && msLeft < 3600000;
+      const isVerySoon = msLeft !== null && msLeft < 600000;
+      const cardClass  = isVerySoon ? 'very-soon' : isSoon ? 'soon' : '';
+      const timeStr    = ts ? localTime(ts) : '';
+      const dateStr    = ts ? localDate(ts) : '';
+
+      let countdownHtml = '';
+      if (ts) {
+        const initial = formatCountdown(ts * 1000 - Date.now());
+        countdownHtml = `<div class="countdown-wrap">
+          <div class="countdown ${initial.urgent ? 'urgent' : ''}" id="${cdId}">${initial.text}</div>
+          <div class="countdown-label">${dateStr} · ${timeStr}</div>
+        </div>`;
+      } else {
+        countdownHtml = `<div class="countdown-wrap">
+          <div style="font-size:13px;font-weight:600;color:var(--text)">${timeStr}</div>
+          <div class="countdown-label">${dateStr}</div>
+        </div>`;
+      }
+
+      html += `<div class="upcoming-card ${cardClass}" id="${cardId}">
+        <div>
+          <div class="upcoming-teams">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
+          <div class="upcoming-meta">${m.competition}</div>
+        </div>
+        ${countdownHtml}
+      </div>`;
+
+      // Iniciar cuenta regresiva si hay timestamp
+      if (ts) {
+        const timer = setInterval(() => {
+          const cdEl = document.getElementById(cdId);
+          const cardEl = document.getElementById(cardId);
+          if (!cdEl) { clearInterval(timer); return; }
+          const remaining = ts * 1000 - Date.now();
+          if (remaining <= 0) {
+            cdEl.textContent = '¡Iniciando!';
+            cdEl.classList.add('urgent');
+            clearInterval(timer);
+            return;
+          }
+          const fmt = formatCountdown(remaining);
+          cdEl.textContent = fmt.text;
+          cdEl.classList.toggle('urgent', fmt.urgent);
+          if (cardEl) {
+            cardEl.classList.toggle('very-soon', remaining < 600000);
+            cardEl.classList.toggle('soon', remaining < 3600000 && remaining >= 600000);
+          }
+        }, 1000);
+        countdownTimers.push(timer);
+      }
+    });
+
+    html += '</div>';
+  }
+
+  // ── Sin resultados ──
+  if (!live.length && !finished.length && !upcoming.length) {
+    html = `<div class="no-results">No se encontraron partidos para "${query}"</div>
+    <div class="no-upcoming">
+      Intenta buscar directamente el nombre de la liga:<br>
+      <strong>Premier League · LaLiga · Champions · Serie A</strong><br><br>
+      Los partidos se muestran el mismo día que se juegan.<br>
+      Horarios Colombia: sábados y domingos 8am–4pm · martes y miércoles 2pm–4pm
+    </div>`;
+  }
+
+  el.innerHTML = html;
 }
 
 // ── Abrir partido ─────────────────────────────────────────────────
