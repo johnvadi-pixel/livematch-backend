@@ -223,7 +223,14 @@
 // CONFIGURACIÓN
 // Cambia esta URL a la dirección de tu backend cuando lo despliegues
 // ─────────────────────────────────────────────────────────────────
-const BACKEND_URL = 'http://localhost:3001';
+const BACKEND_URL = 'https://livematch-backend-production.up.railway.app';
+```
+
+**5.** Clic en **Commit changes** (botón verde)
+
+Railway redespliega automáticamente en ~1 minuto. Después abre en el navegador:
+```
+https://livematch-backend-production.up.railway.app/api/health
 
 // Estado local
 const state = {
