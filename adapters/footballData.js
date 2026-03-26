@@ -73,6 +73,22 @@ async function getTodayMatches(apiKey) {
 }
 
 /**
+ * Partidos de una fecha específica (YYYY-MM-DD)
+ */
+async function getMatchesByDate(apiKey, dateStr) {
+  const client = buildClient(apiKey);
+  try {
+    const { data } = await client.get('/matches', {
+      params: { dateFrom: dateStr, dateTo: dateStr },
+    });
+    return (data.matches || []).map(normalizeMatch);
+  } catch (err) {
+    handleError('getMatchesByDate', err);
+    return [];
+  }
+}
+
+/**
  * Detalle completo de un partido específico
  * Incluye: marcador, estado, minuto, goles, tarjetas
  */
@@ -209,6 +225,7 @@ module.exports = {
   getTodayMatches,
   getMatchDetail,
   getHeadToHead,
+  getMatchesByDate,
   getStandings,
   COMPETITIONS,
 };
