@@ -54,8 +54,8 @@ const io = new Server(server, {
 });
 global._io = io;
 app.use('/reto', retoRoutes(retoDB));
-app.get('/reto/:id', function(req,res){res.sendFile(require('path').join(__dirname,'public/reto-page.html'));});
-app.get('/reto/crear-ui', function(req,res){res.sendFile(path.join(__dirname,'public/reto-crear-ui.html'));});
+app.get('/reto/crear-ui', function(req,res){res.sendFile(path.join(__dirname,'public/reto-crear-ui.html'));
+app.get('/reto/:id', function(req,res){res.sendFile(require('path').join(__dirname,'public/reto-page.html'));});});
 
 // Inyectar io en el poller antes de inicializarlo
 poller.init(io);
