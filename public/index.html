@@ -589,6 +589,32 @@ function openMatch(match) {
     matchId: match.id,
     sofascoreId: match.source === 'sofascore' ? match.id : null,
   });
+
+  // Si el partido terminó, cargar resumen vía REST (fallback si socket no lo envía)
+  if (match.status === 'FINISHED') {
+    const sfId = match.id;
+    setTimeout(() => {
+      // Solo cargar si aún no se renderizó por socket
+      const resumenEl = document.getElementById('resumen-content');
+      if (resumenEl && resumenEl.innerHTML.trim() === '') {
+        fetch(BACKEND_URL + '/api/match/' + sfId + '/summary')
+          .then(r => r.json())
+          .then(summaryData => {
+            if (summaryData.ok) {
+              renderMatchSummary({
+                ...summaryData,
+                homeTeam: match.homeTeam,
+                awayTeam: match.awayTeam,
+                score: match.score,
+                competition: match.competition,
+                competitionId: match.competitionId,
+              });
+            }
+          })
+          .catch(() => {});
+      }
+    }, 1500);
+  }
 }
 
 function goToSearch() {
