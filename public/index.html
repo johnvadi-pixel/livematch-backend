@@ -129,6 +129,92 @@
     .right-panel { height: 300px; }
   }
 
+  /* ── Pantalla partido finalizado ── */
+  .field-final-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: linear-gradient(160deg, #0f1117 0%, #1a1d27 40%, #0d1520 100%);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .field-final-overlay.visible { display: flex; }
+  .final-badge {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 5px 16px;
+    border-radius: 20px;
+  }
+  .final-teams-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 0 24px;
+    margin-bottom: 14px;
+  }
+  .final-team-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+    flex: 1;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .final-score-block {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .final-score-num {
+    font-size: 72px;
+    font-weight: 900;
+    line-height: 1;
+    color: #fff;
+    min-width: 64px;
+    text-align: center;
+  }
+  .final-score-winner { color: #4f8cf7; text-shadow: 0 0 40px rgba(79,140,247,0.6); }
+  .final-score-loser  { color: rgba(255,255,255,0.45); }
+  .final-score-draw   { color: #f0c040; text-shadow: 0 0 40px rgba(240,192,64,0.4); }
+  .final-score-sep {
+    font-size: 40px;
+    font-weight: 200;
+    color: rgba(255,255,255,0.25);
+    margin: 0 2px;
+    align-self: flex-end;
+    padding-bottom: 6px;
+  }
+  .final-winner-label {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    margin-top: 6px;
+  }
+  .final-winner-win  { color: #3ecf8e; }
+  .final-winner-draw { color: #f0c040; }
+  .final-competition {
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+  .final-confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  @keyframes confetti-fall {
+    0%   { transform: translateY(-20px) rotate(0deg) scale(1); opacity: 1; }
+    80%  { opacity: 0.8; }
+    100% { transform: translateY(460px) rotate(900deg) scale(0.5); opacity: 0; }
+  }
+
   /* ── Resumen post-partido ── */
   .summary-section { margin-bottom: 18px; }
   .summary-title { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); text-transform: uppercase; }
@@ -199,6 +285,21 @@
     <div class="field-panel">
       <div class="field-wrap" id="field-wrap">
         <div class="anim-overlay" id="anim-overlay"></div>
+        <div class="field-final-overlay" id="field-final-overlay">
+          <div class="final-confetti" id="final-confetti"></div>
+          <div class="final-badge">⚽ PARTIDO FINALIZADO</div>
+          <div class="final-teams-row">
+            <div class="final-team-name" id="final-home-name">—</div>
+            <div class="final-score-block">
+              <div class="final-score-num" id="final-score-home">0</div>
+              <div class="final-score-sep">—</div>
+              <div class="final-score-num" id="final-score-away">0</div>
+            </div>
+            <div class="final-team-name" id="final-away-name">—</div>
+          </div>
+          <div class="final-winner-label" id="final-winner-label"></div>
+          <div class="final-competition" id="final-competition"></div>
+        </div>
         <svg id="field-svg" width="100%" height="100%" viewBox="0 0 600 420" preserveAspectRatio="xMidYMid meet">
           <rect width="600" height="420" fill="#2d7a2d"/>
           <!-- Franjas -->
@@ -581,6 +682,13 @@ function openMatch(match) {
   const resumenContent = document.getElementById('resumen-content');
   if (resumenContent) resumenContent.innerHTML = '';
 
+  // Mostrar/ocultar pantalla de partido finalizado
+  if (match.status === 'FINISHED') {
+    showFinalScreen(match);
+  } else {
+    hideFinalScreen();
+  }
+
   // Actualizar scoreboard con datos disponibles
   updateScoreboard(match);
 
@@ -940,6 +1048,82 @@ function switchTab(name) {
   const names = ['eventos','stats','once','h2h','resumen'];
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', names[i] === name));
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
+}
+
+// ── Pantalla Partido Finalizado ──────────────────────────────────
+function showFinalScreen(match) {
+  const overlay = document.getElementById('field-final-overlay');
+  if (!overlay) return;
+
+  const sh = match.score?.home ?? '?';
+  const sa = match.score?.away ?? '?';
+  const hName = match.homeTeam?.name || 'Local';
+  const aName = match.awayTeam?.name || 'Visitante';
+  const isDraw = sh === sa;
+  const homeWins = sh > sa;
+
+  // Nombres
+  document.getElementById('final-home-name').textContent = hName;
+  document.getElementById('final-away-name').textContent = aName;
+
+  // Marcador con colores
+  const elHome = document.getElementById('final-score-home');
+  const elAway = document.getElementById('final-score-away');
+  elHome.textContent = sh;
+  elAway.textContent = sa;
+  elHome.className = 'final-score-num ' + (isDraw ? 'final-score-draw' : homeWins ? 'final-score-winner' : 'final-score-loser');
+  elAway.className = 'final-score-num ' + (isDraw ? 'final-score-draw' : !homeWins ? 'final-score-winner' : 'final-score-loser');
+
+  // Etiqueta ganador/empate
+  const winnerEl = document.getElementById('final-winner-label');
+  if (isDraw) {
+    winnerEl.textContent = '⚖️ EMPATE';
+    winnerEl.className = 'final-winner-label final-winner-draw';
+  } else {
+    winnerEl.textContent = '🏆 GANADOR: ' + (homeWins ? hName : aName).toUpperCase();
+    winnerEl.className = 'final-winner-label final-winner-win';
+  }
+
+  // Competición
+  const compEl = document.getElementById('final-competition');
+  if (compEl) compEl.textContent = match.competition || '';
+
+  // Mostrar overlay
+  overlay.classList.add('visible');
+
+  // Confeti si hubo goles (no empate 0-0)
+  if (!(isDraw && sh === 0)) {
+    spawnConfetti();
+  }
+}
+
+function hideFinalScreen() {
+  const overlay = document.getElementById('field-final-overlay');
+  if (overlay) overlay.classList.remove('visible');
+  const confetti = document.getElementById('final-confetti');
+  if (confetti) confetti.innerHTML = '';
+}
+
+function spawnConfetti() {
+  const container = document.getElementById('final-confetti');
+  if (!container) return;
+  container.innerHTML = '';
+  const colors = ['#4f8cf7','#3ecf8e','#f0c040','#e84040','#c084fc','#f97316','#fff'];
+  const count = 45;
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement('div');
+    piece.style.cssText = [
+      'position:absolute',
+      `left:${Math.random() * 100}%`,
+      `width:${4 + Math.random() * 7}px`,
+      `height:${4 + Math.random() * 7}px`,
+      `background:${colors[Math.floor(Math.random() * colors.length)]}`,
+      `border-radius:${Math.random() > 0.5 ? '50%' : '2px'}`,
+      `animation:confetti-fall ${1.5 + Math.random() * 2}s ease-in ${Math.random() * 1.2}s forwards`,
+      'opacity:0',
+    ].join(';');
+    container.appendChild(piece);
+  }
 }
 
 // ── Balón ─────────────────────────────────────────────────────────
