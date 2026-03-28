@@ -80,11 +80,9 @@ io.on('connection', (socket) => {
       // Primero buscar en los partidos de hoy (fuente mÃÂÃÂ¡s confiable)
       const sofascore = require('./adapters/sofascore');
       const today = new Date().toISOString().split('T')[0];
-      const todayMatches = await sofascore.getMatchesByDate(today);
-      const q = query.trim().toLowerCase();
-      const filtered = todayMatches.filter(m =>
-        (function(m,q){var NM={'argentina':['argentina'],'brasil':['brazil','brasil'],'brazil':['brazil','brasil'],'colombia':['colombia'],'mexico':['mexico'],'españa':['spain'],'spain':['spain'],'francia':['france'],'france':['france'],'alemania':['germany'],'germany':['germany'],'italia':['italy'],'italy':['italy'],'portugal':['portugal'],'inglaterra':['england'],'england':['england'],'holanda':['netherlands'],'netherlands':['netherlands'],'uruguay':['uruguay'],'chile':['chile'],'peru':['peru'],'ecuador':['ecuador'],'venezuela':['venezuela'],'usa':['united states','usa'],'estados unidos':['united states','usa'],'canada':['canada'],'marruecos':['morocco'],'morocco':['morocco'],'senegal':['senegal'],'nigeria':['nigeria'],'ghana':['ghana'],'camerun':['cameroon'],'cameroon':['cameroon'],'egipto':['egypt'],'egypt':['egypt'],'japon':['japan'],'japan':['japan'],'corea':['south korea'],'korea':['south korea'],'australia':['australia'],'iran':['iran'],'turquia':['turkey'],'turkey':['turkey'],'croacia':['croatia'],'croatia':['croatia'],'serbia':['serbia'],'eliminatorias':['qualifier','world cup qualifier'],'nations league':['nations league'],'copa america':['copa america'],'eurocopa':['euro','european championship'],'mundial':['world cup'],'selecciones':['nations league','qualifier','world cup','copa america','euro']};var ts=[q];if(NM[q])NM[q].forEach(function(t){ts.push(t);});return ts.some(function(t){return(m.homeTeam?.name||'').toLowerCase().includes(t)||(m.awayTeam?.name||'').toLowerCase().includes(t)||(m.competition||'').toLowerCase().includes(t);});}(m,q))
-      );
+      // Use poller.searchMatches which searches SofaScore by team/competition name
+      const searchResults = await poller.searchMatches(query);
+      const filtered = searchResults || [];
       if (filtered.length > 0) {
         callback?.(filtered);
         socket.emit('search-results', filtered);
