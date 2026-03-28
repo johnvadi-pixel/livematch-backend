@@ -2,175 +2,189 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SportReto — Crear reto</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SportReto</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0d0d14;color:#eeeef5;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:20px 16px 60px;max-width:480px;margin:0 auto}
-.logo{font-size:22px;font-weight:800;color:#00e5a0;margin-bottom:4px}.logo span{color:#eeeef5}
-.match-label{font-size:13px;color:#9898b0;margin-bottom:24px;font-weight:500}
-.section{font-size:10px;letter-spacing:2px;color:#00e5a0;margin-bottom:10px;text-transform:uppercase;font-weight:600}
-.counter{font-size:13px;color:#9898b0;margin-bottom:14px;text-align:center}
-.counter span{color:#00e5a0;font-weight:700;font-size:15px}
-.player-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:#14141e;border:1px solid rgba(255,255,255,.08);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all .15s;user-select:none}
-.player-row:hover{border-color:rgba(255,255,255,.2);background:#1c1c2a}
-.player-row.sel{border-color:#00e5a0;background:rgba(0,229,160,.08)}
-.player-row.disabled{opacity:.3;pointer-events:none}
+body{background:#0d0d14;color:#eeeef5;font-family:'Segoe UI',system-ui,sans-serif;padding:20px 16px 60px;max-width:480px;margin:0 auto}
+.logo{font-size:22px;font-weight:800;color:#00e5a0}.logo span{color:#eeeef5}
+.sub{font-size:13px;color:#9898b0;margin:4px 0 24px;font-weight:500}
+.lbl{font-size:10px;letter-spacing:2px;color:#00e5a0;margin-bottom:10px;text-transform:uppercase;font-weight:600}
+.info{font-size:12px;color:#6b6b85;margin-bottom:14px;text-align:center}
+.count{font-size:13px;color:#9898b0;margin-bottom:14px;text-align:center}
+.count b{color:#00e5a0;font-size:16px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:#14141e;border:1px solid rgba(255,255,255,.08);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.row:active{transform:scale(.98)}
+.row.on{border-color:#00e5a0;background:rgba(0,229,160,.08)}
+.row.off{opacity:.3;pointer-events:none}
 .pos{font-size:10px;color:#6b6b85;background:#1c1c2a;border:1px solid rgba(255,255,255,.08);padding:2px 7px;border-radius:3px;margin-right:10px;min-width:28px;text-align:center}
-.name{font-size:13px;font-weight:500}
-.rating{font-size:11px;color:#9898b0;font-variant-numeric:tabular-nums}
-.rating.hi{color:#00e5a0;font-weight:600}
-.sel-badge{font-size:9px;padding:2px 9px;border-radius:20px;background:rgba(0,229,160,.2);color:#00e5a0;font-weight:600}
-.btn{width:100%;padding:15px;background:#00e5a0;color:#0d0d14;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.5px;margin-top:12px;transition:opacity .15s}
+.pname{font-size:13px;font-weight:500}
+.rat{font-size:11px;color:#9898b0}.rat.hi{color:#00e5a0;font-weight:600}
+.ok{font-size:9px;padding:2px 9px;border-radius:20px;background:rgba(0,229,160,.2);color:#00e5a0;font-weight:600}
+.divider{font-size:10px;color:#6b6b85;letter-spacing:1px;margin:14px 0 8px;text-transform:uppercase}
+.btn{width:100%;padding:15px;background:#00e5a0;color:#0d0d14;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:12px;transition:opacity .15s}
 .btn:disabled{opacity:.25;cursor:not-allowed}
 .btn:hover:not(:disabled){opacity:.88}
-.note{font-size:11px;color:#6b6b85;text-align:center;margin-top:10px}
-.divider{font-size:10px;color:#6b6b85;letter-spacing:1px;margin:14px 0 10px;text-transform:uppercase}
+.step{display:none}.step.active{display:block}
 </style>
 </head>
 <body>
 <div class="logo">Sport<span>Reto</span></div>
-<div class="match-label" id="match-label">Cargando...</div>
-<div class="section">Elige tus 3 jugadores</div>
-<div class="counter">Seleccionados: <span id="count">0</span> / 3</div>
-<div id="player-list"></div>
-<button class="btn" id="btn-crear" disabled onclick="crearReto()">CREAR RETO Y COMPARTIR &#x279C;</button>
-<div class="note" id="note"></div>
+<div class="sub" id="sub">Cargando...</div>
+
+<div class="step active" id="step1">
+  <div class="lbl">Elige tus 3 jugadores</div>
+  <div class="count">Seleccionados: <b id="cnt">0</b> / 3</div>
+  <div class="info" id="info"></div>
+  <div id="list"></div>
+  <button class="btn" id="btn" disabled onclick="siguiente()">CONTINUAR &rarr;</button>
+</div>
+
+<div class="step" id="step2">
+  <div class="lbl">Tu nombre</div>
+  <input id="nombre" placeholder="¿Como te llamas?" maxlength="20"
+    style="width:100%;padding:12px 14px;background:#14141e;border:1px solid rgba(255,255,255,.16);border-radius:8px;color:#eeeef5;font-size:14px;margin-bottom:20px;outline:none">
+  <div class="lbl">Tus jugadores elegidos</div>
+  <div id="selresumen" style="margin-bottom:20px"></div>
+  <button class="btn" onclick="crear()">CREAR RETO Y COMPARTIR &#x279C;</button>
+  <div id="err" style="color:#ff4d6d;font-size:12px;text-align:center;margin-top:10px"></div>
+</div>
 
 <script>
-var params = new URLSearchParams(window.location.search);
-var MATCH_ID = params.get('matchId') || '';
-var MATCH_LABEL = params.get('label') || 'Partido';
-var BASE = window.location.origin;
-var selected = [];
-var players = [];
+var params=new URLSearchParams(location.search);
+var MID=params.get('matchId')||'';
+var LABEL=params.get('label')||'Partido';
+var BASE=location.origin;
+var SEL=[];
+var PLAYERS=[];
 
-document.getElementById('match-label').textContent = MATCH_LABEL;
+document.getElementById('sub').textContent=LABEL;
 
-// Try sessionStorage first (passed from LiveMatch)
-var stored = sessionStorage.getItem('reto_players_' + MATCH_ID);
-if(stored) {
-  try { players = JSON.parse(stored); } catch(e) {}
-}
+// Try sessionStorage first
+var stored=null;
+try{stored=sessionStorage.getItem('reto_players_'+MID);}catch(e){}
+if(stored){try{PLAYERS=JSON.parse(stored);}catch(e){}}
 
-if(players.length > 0) {
-  renderPlayers();
+if(PLAYERS.length>0){
+  render();
 } else {
-  // Try loading from SofaScore via backend
-  document.getElementById('note').textContent = 'Cargando alineaciones del partido...';
-  loadFromSocket();
+  // Show placeholder + try socket in background
+  document.getElementById('info').textContent='Cargando jugadores del partido...';
+  trySocket();
+  setTimeout(function(){
+    if(PLAYERS.length===0) fallback();
+  },4000);
 }
 
-function loadFromSocket() {
-  var script = document.createElement('script');
-  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js';
-  script.onload = function() {
-    var socket = io(BASE);
-    socket.emit('join-match', MATCH_ID);
-    socket.on('match-enrichment', function(data) {
-      if(players.length > 0) return;
-      extractPlayers(data);
-    });
-    socket.on('match-state', function(data) {
-      if(players.length > 0) return;
-      if(data && data.lineups) extractPlayers(data);
-    });
-    setTimeout(function() {
-      if(players.length === 0) showEmpty();
-    }, 5000);
+function trySocket(){
+  var s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js';
+  s.onload=function(){
+    try{
+      var sock=io(BASE);
+      sock.emit('join-match',MID);
+      sock.on('match-enrichment',function(d){if(PLAYERS.length===0&&d){extract(d);} });
+      sock.on('match-state',function(d){if(PLAYERS.length===0&&d&&d.lineups){extract(d);}});
+    }catch(e){}
   };
-  document.head.appendChild(script);
+  document.head.appendChild(s);
 }
 
-function extractPlayers(data) {
-  var all = [];
-  function process(list, team) {
-    var arr = Array.isArray(list) ? list : Object.values(list||{});
-    arr.forEach(function(p) {
-      if(!p) return;
-      var pl = p.player || p;
-      var id = String(pl.id || p.id || '');
-      var name = pl.name || p.name || 'Jugador';
-      var pos = p.position || p.pos || pl.position || '?';
-      var rating = parseFloat(p.rating || pl.rating || p.statistics && p.statistics.rating || 7.0) || 7.0;
-      if(id) all.push({id:id, name:name, pos:pos, rating:rating, team:team});
+function extract(d){
+  var all=[];
+  function proc(list,team){
+    (Array.isArray(list)?list:Object.values(list||{})).forEach(function(p){
+      if(!p)return;
+      var pl=p.player||p;
+      var id=String(pl.id||p.id||'');
+      if(!id)return;
+      all.push({id:id,name:pl.name||p.name||'Jugador',pos:p.position||p.pos||'?',rating:parseFloat(p.rating||pl.rating||7.0)||7.0,team:team});
     });
   }
-  if(data.lineups) { process(data.lineups.home||[], 'home'); process(data.lineups.away||[], 'away'); }
-  else if(data.players) process(data.players, 'home');
-  if(all.length > 0) { players = all; renderPlayers(); }
-  else showEmpty();
+  if(d.lineups){proc(d.lineups.home||[],'home');proc(d.lineups.away||[],'away');}
+  else if(d.players){proc(d.players,'home');}
+  if(all.length>0){PLAYERS=all;render();}
 }
 
-function showEmpty() {
-  document.getElementById('note').textContent = 'No hay alineaciones disponibles aun. El reto se creara con jugadores del partido.';
-  // Show generic create option
-  document.getElementById('player-list').innerHTML = '<div style="text-align:center;padding:20px;color:#6b6b85;font-size:13px">Las alineaciones se confirman minutos antes del partido.<br><br>Puedes crear el reto ahora y elegir jugadores cuando esten disponibles.</div>';
-  document.getElementById('btn-crear').disabled = false;
-  document.getElementById('btn-crear').textContent = 'CREAR RETO SIN JUGADORES';
+function fallback(){
+  document.getElementById('info').textContent='Alineaciones no disponibles aun. Podras editar tus jugadores despues.';
+  // Show generic create without player selection
+  document.getElementById('list').innerHTML='<div style="text-align:center;padding:24px 0;color:#6b6b85;font-size:13px;line-height:1.6">Las alineaciones se confirman<br>minutos antes del partido.<br><br><span style="color:#9898b0">El reto se creara y<br>podras compartirlo ahora.</span></div>';
+  var btn=document.getElementById('btn');
+  btn.disabled=false;
+  btn.textContent='CREAR RETO ➜';
+  btn.onclick=function(){
+    SEL=['0','0','0'];
+    siguiente();
+  };
 }
 
-function renderPlayers() {
-  document.getElementById('note').textContent = '';
+function render(){
+  document.getElementById('info').textContent='';
   renderList();
 }
 
-function renderList() {
-  var list = document.getElementById('player-list');
-  var home = players.filter(function(p){return p.team==='home';});
-  var away = players.filter(function(p){return p.team==='away';});
-
-  function renderGroup(group) {
-    return group.map(function(p) {
-      var isSel = selected.indexOf(p.id) !== -1;
-      var isFull = selected.length >= 3 && !isSel;
-      return '<div class="player-row' + (isSel?' sel':'') + (isFull?' disabled':'') + '" onclick="toggle(\''+p.id+'\')">'+
-        '<div style="display:flex;align-items:center"><span class="pos">'+p.pos+'</span><span class="name">'+p.name+'</span></div>'+
-        '<div style="display:flex;align-items:center;gap:8px">'+
-          '<span class="rating'+(p.rating>=8?' hi':'')+'">'+p.rating.toFixed(1)+'</span>'+
-          (isSel?'<span class="sel-badge">OK</span>':'')+
-        '</div></div>';
-    }).join('');
-  }
-
-  var html = '';
-  if(home.length>0) html += '<div class="divider">Local</div>' + renderGroup(home);
-  if(away.length>0) html += '<div class="divider">Visitante</div>' + renderGroup(away);
-  list.innerHTML = html;
-
-  document.getElementById('count').textContent = selected.length;
-  document.getElementById('btn-crear').disabled = selected.length !== 3;
-  if(selected.length === 3) document.getElementById('btn-crear').textContent = 'CREAR RETO Y COMPARTIR \u279C';
+function renderList(){
+  var home=PLAYERS.filter(function(p){return p.team==='home';});
+  var away=PLAYERS.filter(function(p){return p.team==='away';});
+  var html='';
+  if(home.length){html+='<div class="divider">Local</div>'+renderGroup(home);}
+  if(away.length){html+='<div class="divider">Visitante</div>'+renderGroup(away);}
+  document.getElementById('list').innerHTML=html;
+  document.getElementById('cnt').textContent=SEL.length;
+  document.getElementById('btn').disabled=SEL.length!==3;
 }
 
-function toggle(id) {
-  var idx = selected.indexOf(id);
-  if(idx !== -1) selected.splice(idx, 1);
-  else if(selected.length < 3) selected.push(id);
+function renderGroup(group){
+  return group.map(function(p){
+    var on=SEL.indexOf(p.id)!==-1;
+    var off=SEL.length>=3&&!on;
+    return '<div class="row'+(on?' on':'')+(off?' off':'')+'" onclick="tog(\''+p.id+'\')">'+
+      '<div style="display:flex;align-items:center"><span class="pos">'+p.pos+'</span><span class="pname">'+p.name+'</span></div>'+
+      '<div style="display:flex;align-items:center;gap:8px">'+
+        '<span class="rat'+(p.rating>=8?' hi':'')+'">'+p.rating.toFixed(1)+'</span>'+
+        (on?'<span class="ok">OK</span>':'')+
+      '</div></div>';
+  }).join('');
+}
+
+function tog(id){
+  var i=SEL.indexOf(id);
+  if(i!==-1) SEL.splice(i,1);
+  else if(SEL.length<3) SEL.push(id);
   renderList();
 }
 
-async function crearReto() {
-  var btn = document.getElementById('btn-crear');
-  btn.disabled = true;
-  btn.textContent = 'Creando...';
-  try {
-    var res = await fetch(BASE+'/reto/crear', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({matchId:MATCH_ID, matchLabel:MATCH_LABEL, jugadores:selected.length===3?selected:['0','0','0'], nombre:'Yo'})
-    });
-    var data = await res.json();
-    if(!res.ok) throw new Error(data.error||'Error creando reto');
-    localStorage.setItem('rt_'+data.retoId, data.userToken);
-    // Open WhatsApp
-    window.open(data.whatsapp, '_blank');
-    // Go to reto page
-    setTimeout(function(){ window.location.href = '/reto/'+data.retoId; }, 600);
-  } catch(e) {
-    btn.disabled = false;
-    btn.textContent = 'CREAR RETO Y COMPARTIR \u279C';
-    alert('Error: '+e.message);
+function siguiente(){
+  // Show summary
+  var resumen='';
+  SEL.forEach(function(id){
+    var p=PLAYERS.find(function(x){return x.id===id;})||{name:id,pos:'?'};
+    resumen+='<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#14141e;border:1px solid rgba(0,229,160,.3);border-radius:8px;margin-bottom:8px">'+
+      '<span style="font-size:10px;color:#6b6b85;background:#1c1c2a;padding:2px 7px;border-radius:3px">'+p.pos+'</span>'+
+      '<span style="font-size:13px;font-weight:500">'+p.name+'</span>'+
+      '</div>';
+  });
+  document.getElementById('selresumen').innerHTML=resumen;
+  document.getElementById('step1').classList.remove('active');
+  document.getElementById('step2').classList.add('active');
+}
+
+async function crear(){
+  var nombre=document.getElementById('nombre').value.trim()||'Yo';
+  var btn=document.querySelector('#step2 .btn');
+  btn.disabled=true; btn.textContent='Creando...';
+  try{
+    var res=await fetch(BASE+'/reto/crear',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({matchId:MID,matchLabel:LABEL,jugadores:SEL,nombre:nombre})});
+    var d=await res.json();
+    if(!res.ok) throw new Error(d.error||'Error');
+    try{localStorage.setItem('rt_'+d.retoId,d.userToken);}catch(e){}
+    window.open(d.whatsapp,'_blank');
+    setTimeout(function(){location.href='/reto/'+d.retoId;},700);
+  }catch(e){
+    btn.disabled=false; btn.textContent='CREAR RETO Y COMPARTIR ➜';
+    document.getElementById('err').textContent='Error: '+e.message;
   }
 }
 </script>
