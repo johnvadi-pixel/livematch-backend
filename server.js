@@ -253,7 +253,23 @@ app.get('/api/standings/:tournamentId/:seasonId', async (req, res) => {
   const sofascore = require('./adapters/sofascore');
   const { tournamentId, seasonId } = req.params;
   try {
-    const rows = await sofascore.getStandings(tournamentId, seasonId);
+    // Si seasonId es 'current', obtener la temporada actual del torneo
+    let resolvedSeasonId = seasonId;
+    if (seasonId === 'current') {
+      const axios = require('axios');
+      try {
+        const r = await axios.get(`https://api.sofascore.com/api/v1/unique-tournament/${tournamentId}/seasons`, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/json, text/plain, */*',
+            'Referer': 'https://www.sofascore.com/',
+            'Origin': 'https://www.sofascore.com',
+          }
+        });
+        resolvedSeasonId = r.data.seasons?.[0]?.id || seasonId;
+      } catch(e) { /* use seasonId as-is */ }
+    }
+    const rows = await sofascore.getStandings(tournamentId, resolvedSeasonId);
     res.json({ ok: true, standings: rows });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
