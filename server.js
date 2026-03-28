@@ -22,7 +22,7 @@ const poller     = require('./services/matchPoller');
 
 const app    = express();
 const server = http.createServer(app);
-const PORT = process.env.PORT || 8080;
+const PORT   = process.env.PORT || 3001;
 
 // ── Middleware ────────────────────────────────────────────────────
 
@@ -34,14 +34,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Socket.io ─────────────────────────────────────────────────────
 
+// En producción Railway asigna la URL automáticamente
+// ALLOWED_ORIGIN puede ser '*' o tu dominio exacto: 'https://miapp.up.railway.app'
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
+
 const io = new Server(server, {
   cors: {
-    origin: '*',   // En producción: reemplaza con tu dominio
+    origin: ALLOWED_ORIGIN,
     methods: ['GET', 'POST'],
   },
-  // Reconexión automática del cliente
   pingTimeout: 60000,
   pingInterval: 25000,
+  // Transports: Railway soporta WebSocket nativo
+  transports: ['websocket', 'polling'],
 });
 
 // Inyectar io en el poller antes de inicializarlo
@@ -64,6 +69,22 @@ io.on('connection', (socket) => {
       return callback?.([]);
     }
     try {
+      // Primero buscar en los partidos de hoy (fuente más confiable)
+      const sofascore = require('./adapters/sofascore');
+      const today = new Date().toISOString().split('T')[0];
+      const todayMatches = await sofascore.getMatchesByDate(today);
+      const q = query.trim().toLowerCase();
+      const filtered = todayMatches.filter(m =>
+        (m.homeTeam?.name || '').toLowerCase().includes(q) ||
+        (m.awayTeam?.name || '').toLowerCase().includes(q) ||
+        (m.competition || '').toLowerCase().includes(q)
+      );
+      if (filtered.length > 0) {
+        callback?.(filtered);
+        socket.emit('search-results', filtered);
+        return;
+      }
+      // Si no hay resultados hoy, buscar en próximos días
       const results = await poller.searchMatches(query.trim());
       callback?.(results);
       socket.emit('search-results', results);
