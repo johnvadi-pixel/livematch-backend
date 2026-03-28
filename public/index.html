@@ -1154,6 +1154,10 @@ setInterval(moveBall, 8000);
   function crearReto() {
     var mid = window._retoMatchId || '';
     var lbl = window._retoMatchLabel || 'Partido';
+    // Save available players to sessionStorage so crear-ui can read them
+    if(window._retoPlayers && window._retoPlayers.length > 0) {
+      sessionStorage.setItem('reto_players_' + mid, JSON.stringify(window._retoPlayers));
+    }
     window.open('/reto/crear-ui?matchId=' + encodeURIComponent(mid) + '&label=' + encodeURIComponent(lbl), '_blank');
   }
 </script>
