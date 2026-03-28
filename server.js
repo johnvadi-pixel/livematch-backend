@@ -1,5 +1,5 @@
 /**
- * server.js Ã¢ÂÂ Servidor principal LiveMatch
+ * server.js ÃÂ¢ÃÂÃÂ Servidor principal LiveMatch
  *
  * Arranca Express (API REST) + Socket.io (tiempo real)
  * y conecta el MatchPoller que orquesta football-data + SofaScore.
@@ -26,17 +26,18 @@ const app    = express();
 const server = http.createServer(app);
 const PORT   = process.env.PORT || 3001;
 
-// Ã¢ÂÂÃ¢ÂÂ Middleware Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Middleware ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 
 app.use(cors());
+app.use(function(req,res,next){res.setHeader('Content-Type','text/html; charset=utf-8');next();});
 app.use(express.json());
 
-// Sirve el frontend estÃÂ¡tico desde /public si existe
+// Sirve el frontend estÃÂÃÂ¡tico desde /public si existe
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Ã¢ÂÂÃ¢ÂÂ Socket.io Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Socket.io ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 
-// En producciÃÂ³n Railway asigna la URL automÃÂ¡ticamente
+// En producciÃÂÃÂ³n Railway asigna la URL automÃÂÃÂ¡ticamente
 // ALLOWED_ORIGIN puede ser '*' o tu dominio exacto: 'https://miapp.up.railway.app'
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
 
@@ -61,7 +62,7 @@ poller.init(io);
 io.on('connection', (socket) => {
   console.log(`[socket] conectado: ${socket.id}`);
 
-  // Ã¢ÂÂÃ¢ÂÂ El cliente se une al lobby (lista de partidos en vivo) Ã¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ El cliente se une al lobby (lista de partidos en vivo) ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   socket.on('join-lobby', () => {
     socket.join('lobby');
     // Enviar lista actual de partidos activos inmediatamente
@@ -69,13 +70,13 @@ io.on('connection', (socket) => {
     socket.emit('live-matches', active);
   });
 
-  // Ã¢ÂÂÃ¢ÂÂ El cliente busca un partido Ã¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ El cliente busca un partido ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   socket.on('search', async ({ query }, callback) => {
     if (!query || query.trim().length < 2) {
       return callback?.([]);
     }
     try {
-      // Primero buscar en los partidos de hoy (fuente mÃÂ¡s confiable)
+      // Primero buscar en los partidos de hoy (fuente mÃÂÃÂ¡s confiable)
       const sofascore = require('./adapters/sofascore');
       const today = new Date().toISOString().split('T')[0];
       const todayMatches = await sofascore.getMatchesByDate(today);
@@ -90,7 +91,7 @@ io.on('connection', (socket) => {
         socket.emit('search-results', filtered);
         return;
       }
-      // Si no hay resultados hoy, buscar en prÃÂ³ximos dÃÂ­as
+      // Si no hay resultados hoy, buscar en prÃÂÃÂ³ximos dÃÂÃÂ­as
       const results = await poller.searchMatches(query.trim());
       callback?.(results);
       socket.emit('search-results', results);
@@ -100,14 +101,14 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Ã¢ÂÂÃ¢ÂÂ El cliente se suscribe a un partido especÃÂ­fico Ã¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ El cliente se suscribe a un partido especÃÂÃÂ­fico ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   // matchId: ID de football-data (o cualquier fuente)
   // sofascoreId: ID en SofaScore para datos enriquecidos (opcional)
   socket.on('subscribe-match', async ({ matchId, sofascoreId }) => {
     if (!matchId) return;
     await poller.subscribeToMatch(socket, matchId, sofascoreId);
 
-    // Si el partido ya terminÃÂ³, enviar resumen post-partido
+    // Si el partido ya terminÃÂÃÂ³, enviar resumen post-partido
     const sfId = sofascoreId || matchId;
     try {
       const sofascore = require('./adapters/sofascore');
@@ -133,19 +134,19 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Ã¢ÂÂÃ¢ÂÂ El cliente cancela suscripciÃÂ³n Ã¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ El cliente cancela suscripciÃÂÃÂ³n ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   socket.on('unsubscribe-match', async ({ matchId }) => {
     if (!matchId) return;
     await poller.unsubscribeFromMatch(socket, matchId);
   });
 
-  // Ã¢ÂÂÃ¢ÂÂ DesconexiÃÂ³n Ã¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ DesconexiÃÂÃÂ³n ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   socket.on('disconnect', (reason) => {
-    console.log(`[socket] desconectado: ${socket.id} Ã¢ÂÂ ${reason}`);
+    console.log(`[socket] desconectado: ${socket.id} ÃÂ¢ÃÂÃÂ ${reason}`);
   });
 });
 
-// Ã¢ÂÂÃ¢ÂÂ REST API (endpoints de respaldo sin WebSocket) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ REST API (endpoints de respaldo sin WebSocket) ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 
 /**
  * GET /api/matches/live
@@ -167,7 +168,7 @@ app.get('/api/matches/live', async (req, res) => {
 app.get('/api/matches/search', async (req, res) => {
   const q = req.query.q;
   if (!q || q.trim().length < 2) {
-    return res.status(400).json({ ok: false, error: 'ParÃÂ¡metro q requerido (mÃÂ­n 2 chars)' });
+    return res.status(400).json({ ok: false, error: 'ParÃÂÃÂ¡metro q requerido (mÃÂÃÂ­n 2 chars)' });
   }
   try {
     const results = await poller.searchMatches(q.trim());
@@ -179,7 +180,7 @@ app.get('/api/matches/search', async (req, res) => {
 
 /**
  * GET /api/matches/today
- * Todos los partidos de hoy (en curso, terminados, prÃÂ³ximos)
+ * Todos los partidos de hoy (en curso, terminados, prÃÂÃÂ³ximos)
  */
 app.get('/api/matches/today', async (req, res) => {
   const footballData = require('./adapters/footballData');
@@ -291,25 +292,25 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Ã¢ÂÂÃ¢ÂÂ Arranque Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Arranque ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 
 server.listen(PORT, () => {
   console.log('');
-  console.log('  Ã¢ÂÂ½  LiveMatch Backend corriendo');
-  console.log(`  Ã¢ÂÂ  http://localhost:${PORT}`);
-  console.log(`  Ã¢ÂÂ  WebSocket en ws://localhost:${PORT}`);
+  console.log('  ÃÂ¢ÃÂÃÂ½  LiveMatch Backend corriendo');
+  console.log(`  ÃÂ¢ÃÂÃÂ  http://localhost:${PORT}`);
+  console.log(`  ÃÂ¢ÃÂÃÂ  WebSocket en ws://localhost:${PORT}`);
   console.log('');
 
   const key = process.env.FOOTBALL_DATA_API_KEY;
   if (!key || key === 'tu_clave_aqui') {
-    console.warn('  Ã¢ÂÂ   FOOTBALL_DATA_API_KEY no configurada');
-    console.warn('     RegÃÂ­strate gratis en https://www.football-data.org/client/register');
+    console.warn('  ÃÂ¢ÃÂÃÂ   FOOTBALL_DATA_API_KEY no configurada');
+    console.warn('     RegÃÂÃÂ­strate gratis en https://www.football-data.org/client/register');
     console.warn('     Edita el archivo .env con tu clave');
     console.warn('');
   } else {
-    console.log('  Ã¢ÂÂ  football-data.org configurado');
+    console.log('  ÃÂ¢ÃÂÃÂ  football-data.org configurado');
   }
-  console.log('  Ã¢ÂÂ  SofaScore activo (sin clave requerida)');
+  console.log('  ÃÂ¢ÃÂÃÂ  SofaScore activo (sin clave requerida)');
   console.log('');
 });
 
