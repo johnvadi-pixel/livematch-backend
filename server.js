@@ -83,7 +83,7 @@ io.on('connection', (socket) => {
       const todayMatches = await sofascore.getMatchesByDate(today);
       const q = query.trim().toLowerCase();
       const // Mapa de países (español/inglés) a nombres de selecciones y palabras clave
-      const NATIONAL_MAP = {
+      var NATIONAL_MAP = {
         'argentina': ['argentina'],
         'brasil': ['brazil','brasil'], 'brazil': ['brazil','brasil'],
         'colombia': ['colombia'],
@@ -153,7 +153,7 @@ io.on('connection', (socket) => {
         'mundial': ['world cup','fifa world cup']
       };
       // Build expanded search terms
-      const searchTerms = [q];
+      var searchTerms = [q];
       if (NATIONAL_MAP[q]) { searchTerms.push(...NATIONAL_MAP[q]); }
       // Also check if query matches any key and add its values
       Object.keys(NATIONAL_MAP).forEach(key => {
@@ -161,11 +161,11 @@ io.on('connection', (socket) => {
           searchTerms.push(...NATIONAL_MAP[key]);
         }
       });
-      const matchesSearch = (m) => {
-        const home = (m.homeTeam?.name || '').toLowerCase();
-        const away = (m.awayTeam?.name || '').toLowerCase();
-        const comp = (m.competition || '').toLowerCase();
-        const country = (m.homeTeam?.country || m.awayTeam?.country || '').toLowerCase();
+      var matchesSearch = function(m) {
+        var home = (m.homeTeam?.name || '').toLowerCase();
+        var away = (m.awayTeam?.name || '').toLowerCase();
+        var comp = (m.competition || '').toLowerCase();
+        var country = (m.homeTeam?.country || m.awayTeam?.country || '').toLowerCase();
         return searchTerms.some(term =>
           home.includes(term) || away.includes(term) ||
           comp.includes(term) || country.includes(term)
