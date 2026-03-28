@@ -82,74 +82,16 @@ io.on('connection', (socket) => {
       const today = new Date().toISOString().split('T')[0];
       const todayMatches = await sofascore.getMatchesByDate(today);
       const q = query.trim().toLowerCase();
-      // National teams map (Spanish/English country names -> team names)
-      const NATIONAL_MAP = {
-        'argentina':['argentina'],'brasil':['brazil','brasil'],'brazil':['brazil','brasil'],
-        'colombia':['colombia'],'mexico':['mexico','méxico'],'méxico':['mexico','méxico'],
-        'españa':['spain','españa'],'spain':['spain','españa'],
-        'francia':['france','francia'],'france':['france','francia'],
-        'alemania':['germany','alemania'],'germany':['germany','alemania'],
-        'italia':['italy','italia'],'italy':['italy','italia'],
-        'portugal':['portugal'],'inglaterra':['england','inglaterra'],'england':['england','inglaterra'],
-        'holanda':['netherlands','holanda'],'netherlands':['netherlands','holanda'],
-        'belgica':['belgium','bélgica'],'belgium':['belgium','bélgica'],
-        'uruguay':['uruguay'],'chile':['chile'],'peru':['peru','perú'],'perú':['peru','perú'],
-        'ecuador':['ecuador'],'venezuela':['venezuela'],'paraguay':['paraguay'],'bolivia':['bolivia'],
-        'estados unidos':['usa','united states'],'usa':['usa','united states'],
-        'canada':['canada','canadá'],'canadá':['canada','canadá'],
-        'costa rica':['costa rica'],'panama':['panama','panamá'],'panamá':['panama','panamá'],
-        'marruecos':['morocco','marruecos'],'morocco':['morocco','marruecos'],
-        'senegal':['senegal'],'nigeria':['nigeria'],'ghana':['ghana'],
-        'camerun':['cameroon','camerún'],'cameroon':['cameroon','camerún'],
-        'egipto':['egypt','egipto'],'egypt':['egypt','egipto'],
-        'japon':['japan','japón'],'japan':['japan','japón'],
-        'corea':['south korea','korea'],'korea':['south korea','korea'],
-        'australia':['australia'],'iran':['iran','irán'],'irán':['iran','irán'],
-        'arabia saudita':['saudi arabia'],'saudi':['saudi arabia'],
-        'turquia':['turkey','turquía'],'turkey':['turkey','turquía'],
-        'croacia':['croatia','croacia'],'croatia':['croatia','croacia'],
-        'serbia':['serbia'],'dinamarca':['denmark','dinamarca'],'denmark':['denmark','dinamarca'],
-        'suecia':['sweden','suecia'],'sweden':['sweden','suecia'],
-        'noruega':['norway','noruega'],'norway':['norway','noruega'],
-        'suiza':['switzerland','suiza'],'switzerland':['switzerland','suiza'],
-        'austria':['austria'],'polonia':['poland','polonia'],'poland':['poland','polonia'],
-        'ucrania':['ukraine','ucrania'],'ukraine':['ukraine','ucrania'],
-        'escocia':['scotland','escocia'],'scotland':['scotland','escocia'],
-        'gales':['wales','gales'],'wales':['wales','gales'],
-        'grecia':['greece','grecia'],'greece':['greece','grecia'],
-        'sudafrica':['south africa'],'south africa':['south africa'],
-        'tunez':['tunisia'],'nigeria':['nigeria'],'ghana':['ghana'],
-        'china':['china'],'india':['india'],'qatar':['qatar'],
-        'eliminatorias':['qualifier','eliminatorias','world cup qualifier'],
-        'nations league':['nations league'],'copa america':['copa america'],
-        'eurocopa':['euro','european championship'],
-        'mundial':['world cup','fifa world cup'],
-        'selecciones':['nations league','qualifier','world cup','copa america','euro','international']
-      };
-      // Expand search terms using national map
-      const searchTerms = [q];
-      if (NATIONAL_MAP[q]) searchTerms.push(...NATIONAL_MAP[q]);
-      Object.keys(NATIONAL_MAP).forEach(k => {
-        if (k !== q && (k.includes(q) || q.includes(k))) searchTerms.push(...NATIONAL_MAP[k]);
-      });
-      filtered = todayMatches.filter(m => {
-        const home = (m.homeTeam?.name || '').toLowerCase();
-        const away = (m.awayTeam?.name || '').toLowerCase();
+      const filtered = todayMatches.filter(function(m) {
+        const NMAP = {'argentina':['argentina'],'brasil':['brazil','brasil'],'brazil':['brazil','brasil'],'colombia':['colombia'],'mexico':['mexico','méxico'],'méxico':['mexico','méxico'],'españa':['spain','españa'],'spain':['spain','españa'],'francia':['france','francia'],'france':['france','francia'],'alemania':['germany','alemania'],'germany':['germany','alemania'],'italia':['italy','italia'],'italy':['italy','italia'],'portugal':['portugal'],'inglaterra':['england','inglaterra'],'england':['england','inglaterra'],'holanda':['netherlands','holanda'],'netherlands':['netherlands','holanda'],'belgica':['belgium'],'belgium':['belgium'],'uruguay':['uruguay'],'chile':['chile'],'peru':['peru','perú'],'perú':['peru','perú'],'ecuador':['ecuador'],'venezuela':['venezuela'],'paraguay':['paraguay'],'bolivia':['bolivia'],'usa':['usa','united states'],'estados unidos':['usa','united states'],'canada':['canada'],'canadá':['canada'],'costa rica':['costa rica'],'marruecos':['morocco'],'morocco':['morocco'],'senegal':['senegal'],'nigeria':['nigeria'],'ghana':['ghana'],'camerun':['cameroon'],'cameroon':['cameroon'],'egipto':['egypt'],'egypt':['egypt'],'japon':['japan'],'japan':['japan'],'corea':['south korea','korea'],'korea':['south korea','korea'],'australia':['australia'],'iran':['iran'],'irán':['iran'],'turquia':['turkey'],'turkey':['turkey'],'croacia':['croatia'],'croatia':['croatia'],'serbia':['serbia'],'dinamarca':['denmark'],'denmark':['denmark'],'suecia':['sweden'],'sweden':['sweden'],'noruega':['norway'],'norway':['norway'],'suiza':['switzerland'],'switzerland':['switzerland'],'austria':['austria'],'polonia':['poland'],'poland':['poland'],'ucrania':['ukraine'],'ukraine':['ukraine'],'escocia':['scotland'],'scotland':['scotland'],'gales':['wales'],'wales':['wales'],'grecia':['greece'],'greece':['greece'],'sudafrica':['south africa'],'south africa':['south africa'],'china':['china'],'india':['india'],'qatar':['qatar'],'eliminatorias':['qualifier','eliminatorias','world cup qualifier'],'nations league':['nations league'],'copa america':['copa america'],'eurocopa':['euro','european championship'],'mundial':['world cup','fifa world cup'],'selecciones':['nations league','qualifier','world cup','copa america','euro','international']};
+        const terms = [q];
+        if (NMAP[q]) terms.push.apply(terms, NMAP[q]);
+        Object.keys(NMAP).forEach(function(k){ if(k !== q && (k.indexOf(q) !== -1 || q.indexOf(k) !== -1)) terms.push.apply(terms, NMAP[k]); });
+        const home = (m.homeTeam && m.homeTeam.name || '').toLowerCase();
+        const away = (m.awayTeam && m.awayTeam.name || '').toLowerCase();
         const comp = (m.competition || '').toLowerCase();
-        return searchTerms.some(t => home.includes(t) || away.includes(t) || comp.includes(t));
+        return terms.some(function(t){ return home.indexOf(t) !== -1 || away.indexOf(t) !== -1 || comp.indexOf(t) !== -1; });
       });
-      socket.emit('search-results', filtered);
-        return;
-      }
-      // Si no hay resultados hoy, buscar en prÃÂÃÂ³ximos dÃÂÃÂ­as
-      const results = await poller.searchMatches(query.trim());
-      callback?.(results);
-      socket.emit('search-results', results);
-    } catch (err) {
-      console.error('[socket] search error:', err.message);
-      callback?.([]);
-    }
-  });
 
   // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ El cliente se suscribe a un partido especÃÂÃÂ­fico ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   // matchId: ID de football-data (o cualquier fuente)
