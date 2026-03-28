@@ -775,10 +775,12 @@ function renderMatchSummary(data) {
   // ── Jugador del partido ──
   const pom = data.bestPlayers?.playerOfMatch;
   if (pom && pom.name) {
+    const ratingColor = pom.rating >= 8 ? '#3ecf8e' : pom.rating >= 7 ? '#f0c040' : '#e87040';
     html += `<div class="summary-section pom-card">
       <div class="pom-label">⭐ JUGADOR DEL PARTIDO</div>
       <div class="pom-name">${pom.name}</div>
-      ${pom.rating ? `<div class="pom-rating">${pom.rating}</div>` : ''}
+      ${pom.rating ? `<div class="pom-rating" style="color:${ratingColor}">${pom.rating}</div>` : ''}
+      <div style="font-size:10px;color:var(--muted);margin-top:4px">${pom.teamSide === 'home' ? (data.homeTeam?.name || 'Local') : (data.awayTeam?.name || 'Visitante')}</div>
     </div>`;
   }
 
@@ -786,13 +788,20 @@ function renderMatchSummary(data) {
   const homePlayers = data.bestPlayers?.home || [];
   const awayPlayers = data.bestPlayers?.away || [];
   if (homePlayers.length || awayPlayers.length) {
+    const ratingColor = (r) => {
+      const n = parseFloat(r);
+      if (n >= 8.5) return '#3ecf8e';
+      if (n >= 7.5) return '#4f8cf7';
+      if (n >= 6.5) return '#f0c040';
+      return '#e87040';
+    };
     const renderPlayerRow = (p) => `
       <div class="player-row">
-        <div>
+        <div style="flex:1">
           <div class="player-name">${p.name}</div>
-          <div class="player-stats">${p.goals ? '⚽ ' + p.goals : ''}${p.assists ? ' 🎯 ' + p.assists : ''} ${p.position || ''}</div>
+          <div class="player-stats">${p.goals ? '⚽ ' + p.goals + ' gol' + (p.goals > 1 ? 'es' : '') : ''}${p.assists ? ' 🎯 ' + p.assists : ''} <span style="color:var(--muted)">${p.position || ''}</span></div>
         </div>
-        ${p.rating ? `<div class="player-rating">${p.rating}</div>` : ''}
+        ${p.rating ? `<div class="player-rating" style="color:${ratingColor(p.rating)}">${p.rating}</div>` : ''}
       </div>`;
 
     html += `<div class="summary-section">
@@ -800,35 +809,49 @@ function renderMatchSummary(data) {
       <div class="players-grid">
         <div>
           <div class="players-col-title" style="color:var(--accent)">${data.homeTeam?.name || 'LOCAL'}</div>
-          ${homePlayers.map(renderPlayerRow).join('')}
+          ${homePlayers.length ? homePlayers.map(renderPlayerRow).join('') : '<div style="font-size:12px;color:var(--muted);padding:8px 0">Sin datos</div>'}
         </div>
         <div>
           <div class="players-col-title" style="color:var(--red)">${data.awayTeam?.name || 'VISITANTE'}</div>
-          ${awayPlayers.map(renderPlayerRow).join('')}
+          ${awayPlayers.length ? awayPlayers.map(renderPlayerRow).join('') : '<div style="font-size:12px;color:var(--muted);padding:8px 0">Sin datos</div>'}
         </div>
       </div>
     </div>`;
   }
 
-  // ── Eventos del partido (goles y tarjetas) ──
-  const events = (data.events || []).filter(e => ['gol','gol-en-contra','tarjeta-roja','tarjeta-amarilla'].includes(e.type));
-  if (events.length) {
-    const iconMap = { 'gol': '⚽', 'gol-en-contra': '⚽🔴', 'tarjeta-amarilla': '🟨', 'tarjeta-roja': '🟥' };
-    html += `<div class="summary-section">
-      <div class="summary-title">📋 RESUMEN DEL PARTIDO</div>
-      ${events.map(e => `
-        <div class="event-feed-item">
-          <span class="event-min-sm">${e.minute}'${e.minuteExtra ? '+'+e.minuteExtra : ''}</span>
-          <span>${iconMap[e.type] || '•'}</span>
-          <span style="flex:1;font-weight:600">${e.player}</span>
-          <span style="font-size:11px;color:var(--muted)">${e.team === 'home' ? (data.homeTeam?.name || 'Local') : (data.awayTeam?.name || 'Visitante')}</span>
-        </div>`).join('')}
+  // ── Resultado final ──
+  if (data.score) {
+    const result = data.score.home > data.score.away ? data.homeTeam?.name + ' gana' :
+                   data.score.away > data.score.home ? data.awayTeam?.name + ' gana' : 'Empate';
+    html += `<div class="summary-section" style="background:rgba(255,255,255,0.03);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:13px;font-weight:700;color:var(--text)">${data.homeTeam?.name || 'Local'}</span>
+      <span style="font-size:20px;font-weight:900;color:var(--accent)">${data.score.home} – ${data.score.away}</span>
+      <span style="font-size:13px;font-weight:700;color:var(--text)">${data.awayTeam?.name || 'Visitante'}</span>
     </div>`;
   }
 
-  el.innerHTML = html || '<div class="loading">No hay datos de resumen disponibles</div>';
+  // ── Eventos del partido (goles y tarjetas) ──
+  const events = (data.events || []).filter(e => ['gol','gol-en-contra','tarjeta-roja','tarjeta-amarilla','cambio'].includes(e.type));
+  const keyEvents = events.filter(e => ['gol','gol-en-contra','tarjeta-roja','tarjeta-amarilla'].includes(e.type));
+  if (keyEvents.length) {
+    const iconMap = { 'gol': '⚽', 'gol-en-contra': '⚽🔴', 'tarjeta-amarilla': '🟨', 'tarjeta-roja': '🟥' };
+    html += `<div class="summary-section">
+      <div class="summary-title">📋 EVENTOS CLAVE</div>
+      ${keyEvents.map(e => {
+        const teamName = e.team === 'home' ? (data.homeTeam?.name || 'Local') : (data.awayTeam?.name || 'Visitante');
+        return `<div class="event-feed-item">
+          <span class="event-min-sm">${e.minute}'${e.minuteExtra ? '+'+e.minuteExtra : ''}</span>
+          <span>${iconMap[e.type] || '•'}</span>
+          <span style="flex:1;font-weight:600">${e.player || '?'}</span>
+          <span style="font-size:11px;color:var(--muted);text-align:right">${teamName}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
 
-  // Cargar tabla de posiciones aparte si hay competitionId
+  el.innerHTML = html || '<div class="loading">Cargando datos del partido…</div>';
+
+  // Cargar tabla de posiciones por separado si hay competitionId
   if (data.competitionId) {
     loadStandings(data.competitionId, data.homeTeam, data.awayTeam, el);
   }
