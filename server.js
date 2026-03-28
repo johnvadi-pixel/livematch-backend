@@ -1,5 +1,5 @@
 /**
- * server.js â Servidor principal LiveMatch
+ * server.js Ã¢ÂÂ Servidor principal LiveMatch
  *
  * Arranca Express (API REST) + Socket.io (tiempo real)
  * y conecta el MatchPoller que orquesta football-data + SofaScore.
@@ -26,17 +26,17 @@ const app    = express();
 const server = http.createServer(app);
 const PORT   = process.env.PORT || 3001;
 
-// ââ Middleware ââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ Middleware Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 
 app.use(cors());
 app.use(express.json());
 
-// Sirve el frontend estÃ¡tico desde /public si existe
+// Sirve el frontend estÃÂ¡tico desde /public si existe
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ââ Socket.io âââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ Socket.io Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 
-// En producciÃ³n Railway asigna la URL automÃ¡ticamente
+// En producciÃÂ³n Railway asigna la URL automÃÂ¡ticamente
 // ALLOWED_ORIGIN puede ser '*' o tu dominio exacto: 'https://miapp.up.railway.app'
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
 
@@ -53,6 +53,7 @@ const io = new Server(server, {
 global._io = io;
 app.use('/reto', retoRoutes(retoDB));
 app.get('/reto/:id', function(req,res){res.sendFile(require('path').join(__dirname,'public/reto-page.html'));});
+app.get('/reto/crear-ui', function(req,res){res.sendFile(path.join(__dirname,'public/reto-crear-ui.html'));});
 
 // Inyectar io en el poller antes de inicializarlo
 poller.init(io);
@@ -60,7 +61,7 @@ poller.init(io);
 io.on('connection', (socket) => {
   console.log(`[socket] conectado: ${socket.id}`);
 
-  // ââ El cliente se une al lobby (lista de partidos en vivo) ââ
+  // Ã¢ÂÂÃ¢ÂÂ El cliente se une al lobby (lista de partidos en vivo) Ã¢ÂÂÃ¢ÂÂ
   socket.on('join-lobby', () => {
     socket.join('lobby');
     // Enviar lista actual de partidos activos inmediatamente
@@ -68,13 +69,13 @@ io.on('connection', (socket) => {
     socket.emit('live-matches', active);
   });
 
-  // ââ El cliente busca un partido ââ
+  // Ã¢ÂÂÃ¢ÂÂ El cliente busca un partido Ã¢ÂÂÃ¢ÂÂ
   socket.on('search', async ({ query }, callback) => {
     if (!query || query.trim().length < 2) {
       return callback?.([]);
     }
     try {
-      // Primero buscar en los partidos de hoy (fuente mÃ¡s confiable)
+      // Primero buscar en los partidos de hoy (fuente mÃÂ¡s confiable)
       const sofascore = require('./adapters/sofascore');
       const today = new Date().toISOString().split('T')[0];
       const todayMatches = await sofascore.getMatchesByDate(today);
@@ -89,7 +90,7 @@ io.on('connection', (socket) => {
         socket.emit('search-results', filtered);
         return;
       }
-      // Si no hay resultados hoy, buscar en prÃ³ximos dÃ­as
+      // Si no hay resultados hoy, buscar en prÃÂ³ximos dÃÂ­as
       const results = await poller.searchMatches(query.trim());
       callback?.(results);
       socket.emit('search-results', results);
@@ -99,14 +100,14 @@ io.on('connection', (socket) => {
     }
   });
 
-  // ââ El cliente se suscribe a un partido especÃ­fico ââ
+  // Ã¢ÂÂÃ¢ÂÂ El cliente se suscribe a un partido especÃÂ­fico Ã¢ÂÂÃ¢ÂÂ
   // matchId: ID de football-data (o cualquier fuente)
   // sofascoreId: ID en SofaScore para datos enriquecidos (opcional)
   socket.on('subscribe-match', async ({ matchId, sofascoreId }) => {
     if (!matchId) return;
     await poller.subscribeToMatch(socket, matchId, sofascoreId);
 
-    // Si el partido ya terminÃ³, enviar resumen post-partido
+    // Si el partido ya terminÃÂ³, enviar resumen post-partido
     const sfId = sofascoreId || matchId;
     try {
       const sofascore = require('./adapters/sofascore');
@@ -132,19 +133,19 @@ io.on('connection', (socket) => {
     }
   });
 
-  // ââ El cliente cancela suscripciÃ³n ââ
+  // Ã¢ÂÂÃ¢ÂÂ El cliente cancela suscripciÃÂ³n Ã¢ÂÂÃ¢ÂÂ
   socket.on('unsubscribe-match', async ({ matchId }) => {
     if (!matchId) return;
     await poller.unsubscribeFromMatch(socket, matchId);
   });
 
-  // ââ DesconexiÃ³n ââ
+  // Ã¢ÂÂÃ¢ÂÂ DesconexiÃÂ³n Ã¢ÂÂÃ¢ÂÂ
   socket.on('disconnect', (reason) => {
-    console.log(`[socket] desconectado: ${socket.id} â ${reason}`);
+    console.log(`[socket] desconectado: ${socket.id} Ã¢ÂÂ ${reason}`);
   });
 });
 
-// ââ REST API (endpoints de respaldo sin WebSocket) âââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ REST API (endpoints de respaldo sin WebSocket) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 
 /**
  * GET /api/matches/live
@@ -166,7 +167,7 @@ app.get('/api/matches/live', async (req, res) => {
 app.get('/api/matches/search', async (req, res) => {
   const q = req.query.q;
   if (!q || q.trim().length < 2) {
-    return res.status(400).json({ ok: false, error: 'ParÃ¡metro q requerido (mÃ­n 2 chars)' });
+    return res.status(400).json({ ok: false, error: 'ParÃÂ¡metro q requerido (mÃÂ­n 2 chars)' });
   }
   try {
     const results = await poller.searchMatches(q.trim());
@@ -178,7 +179,7 @@ app.get('/api/matches/search', async (req, res) => {
 
 /**
  * GET /api/matches/today
- * Todos los partidos de hoy (en curso, terminados, prÃ³ximos)
+ * Todos los partidos de hoy (en curso, terminados, prÃÂ³ximos)
  */
 app.get('/api/matches/today', async (req, res) => {
   const footballData = require('./adapters/footballData');
@@ -290,25 +291,25 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ââ Arranque ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ Arranque Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 
 server.listen(PORT, () => {
   console.log('');
-  console.log('  â½  LiveMatch Backend corriendo');
-  console.log(`  â  http://localhost:${PORT}`);
-  console.log(`  â  WebSocket en ws://localhost:${PORT}`);
+  console.log('  Ã¢ÂÂ½  LiveMatch Backend corriendo');
+  console.log(`  Ã¢ÂÂ  http://localhost:${PORT}`);
+  console.log(`  Ã¢ÂÂ  WebSocket en ws://localhost:${PORT}`);
   console.log('');
 
   const key = process.env.FOOTBALL_DATA_API_KEY;
   if (!key || key === 'tu_clave_aqui') {
-    console.warn('  â   FOOTBALL_DATA_API_KEY no configurada');
-    console.warn('     RegÃ­strate gratis en https://www.football-data.org/client/register');
+    console.warn('  Ã¢ÂÂ   FOOTBALL_DATA_API_KEY no configurada');
+    console.warn('     RegÃÂ­strate gratis en https://www.football-data.org/client/register');
     console.warn('     Edita el archivo .env con tu clave');
     console.warn('');
   } else {
-    console.log('  â  football-data.org configurado');
+    console.log('  Ã¢ÂÂ  football-data.org configurado');
   }
-  console.log('  â  SofaScore activo (sin clave requerida)');
+  console.log('  Ã¢ÂÂ  SofaScore activo (sin clave requerida)');
   console.log('');
 });
 
