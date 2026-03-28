@@ -15,7 +15,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
 
-  /* ── Layout ── */
+  /* ââ Layout ââ */
   .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
   .logo { font-size: 18px; font-weight: 700; }
   .logo span { color: var(--accent); }
@@ -25,7 +25,7 @@
   .disconnected { background: #3a0a0a; color: var(--red); }
   @keyframes blink { 50% { opacity: 0.4; } }
 
-  /* ── Pantalla de búsqueda ── */
+  /* ââ Pantalla de bÃºsqueda ââ */
   #screen-search { padding: 60px 20px; max-width: 620px; margin: 0 auto; }
   .search-title { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
   .search-sub { color: var(--muted); font-size: 15px; margin-bottom: 32px; }
@@ -61,7 +61,7 @@
   .countdown-label { font-size: 10px; color: var(--muted); margin-top: 1px; }
   .no-upcoming { text-align: center; padding: 20px 0; color: var(--muted); font-size: 13px; line-height: 1.9; }
 
-  /* ── Tablero del partido ── */
+  /* ââ Tablero del partido ââ */
   #screen-match { display: none; }
   .back-btn { background: none; border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
   .back-btn:hover { color: var(--text); border-color: var(--accent); }
@@ -75,7 +75,7 @@
   .competition-label { font-size: 11px; color: var(--muted); text-align: center; margin-top: 3px; }
   .main { display: grid; grid-template-columns: 1fr 300px; height: calc(100vh - 118px); }
 
-  /* ── Campo ── */
+  /* ââ Campo ââ */
   .field-panel { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
   .field-wrap { flex: 1; background: #2d7a2d; border-radius: 12px; overflow: hidden; position: relative; min-height: 280px; }
   .anim-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
@@ -86,7 +86,7 @@
   .card-anim { position: absolute; top: 40%; left: 50%; transform: translate(-50%,-50%); border-radius: 4px; width: 26px; height: 38px; animation: cp 2s ease-out forwards; }
   @keyframes cp { 0%{opacity:0;transform:translate(-50%,-50%) scale(0.2)} 15%{opacity:1;transform:translate(-50%,-70%) scale(1.2)} 80%{opacity:1} 100%{opacity:0;transform:translate(-50%,-130%)} }
 
-  /* ── Panel derecho ── */
+  /* ââ Panel derecho ââ */
   .right-panel { background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
   .tabs { display: flex; border-bottom: 1px solid var(--border); }
   .tab { flex: 1; padding: 11px 4px; text-align: center; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all 0.2s; letter-spacing: 0.4px; }
@@ -97,7 +97,7 @@
   .tab-content::-webkit-scrollbar { width: 4px; }
   .tab-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  /* ── Eventos ── */
+  /* ââ Eventos ââ */
   .event-item { display: flex; gap: 8px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid var(--border); }
   .event-item:last-child { border-bottom: none; }
   .event-min { font-size: 11px; font-weight: 700; color: var(--accent); min-width: 28px; padding-top: 2px; }
@@ -105,20 +105,20 @@
   .event-text strong { display: block; font-size: 13px; font-weight: 600; }
   .event-text span { color: var(--muted); font-size: 11px; }
 
-  /* ── Stats ── */
+  /* ââ Stats ââ */
   .stat-row { margin-bottom: 13px; }
   .stat-labels { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
   .stat-bar-wrap { background: rgba(255,255,255,0.07); border-radius: 4px; height: 5px; display: flex; }
   .stat-bar-h { background: var(--accent); height: 100%; border-radius: 4px 0 0 4px; transition: width 0.6s; }
   .stat-bar-a { background: var(--red); height: 100%; border-radius: 0 4px 4px 0; transition: width 0.6s; }
 
-  /* ── Lineup ── */
+  /* ââ Lineup ââ */
   .form-row { display: flex; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; gap: 8px; }
   .form-row:last-child { border-bottom: none; }
   .form-row .num { font-weight: 700; min-width: 22px; font-size: 12px; color: var(--muted); }
   .form-row .pos { font-size: 10px; color: var(--muted); min-width: 28px; text-align: right; }
 
-  /* ── H2H ── */
+  /* ââ H2H ââ */
   .h2h-item { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; display: flex; justify-content: space-between; }
   .h2h-item:last-child { border-bottom: none; }
   .h2h-score { font-weight: 700; color: var(--accent); }
@@ -129,7 +129,7 @@
     .right-panel { height: 300px; }
   }
 
-  /* ── Pantalla partido finalizado ── */
+  /* ââ Pantalla partido finalizado ââ */
   .field-final-overlay {
     display: none;
     position: absolute;
@@ -215,7 +215,7 @@
     100% { transform: translateY(460px) rotate(900deg) scale(0.5); opacity: 0; }
   }
 
-  /* ── Resumen post-partido ── */
+  /* ââ Resumen post-partido ââ */
   .summary-section { margin-bottom: 18px; }
   .summary-title { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); text-transform: uppercase; }
   .pom-card { background: linear-gradient(135deg, rgba(79,140,247,0.15), rgba(62,207,142,0.1)); border: 1px solid rgba(79,140,247,0.3); border-radius: 10px; padding: 14px; text-align: center; margin-bottom: 14px; }
@@ -246,37 +246,37 @@
   <div class="logo">Live<span>Match</span></div>
   <div style="display:flex;align-items:center;gap:12px">
     <span id="conn-status" class="connecting">CONECTANDO</span>
-    <button class="back-btn" id="back-btn" style="display:none" onclick="goToSearch()">← Partidos</button>
+    <button class="back-btn" id="back-btn" style="display:none" onclick="goToSearch()">â Partidos</button>
   </div>
 </div>
 
-<!-- ── Pantalla búsqueda ── -->
+<!-- ââ Pantalla bÃºsqueda ââ -->
 <div id="screen-search">
   <div class="search-title">Partidos en vivo</div>
-  <div class="search-sub">Busca un equipo, liga o selección</div>
+  <div class="search-sub">Busca un equipo, liga o selecciÃ³n</div>
   <div class="search-box">
-    <input class="search-input" id="search-input" type="text" placeholder="Real Madrid, Premier League, Colombia…" onkeydown="if(event.key==='Enter') doSearch()">
+    <input class="search-input" id="search-input" type="text" placeholder="Real Madrid, Premier League, Colombiaâ¦" onkeydown="if(event.key==='Enter') doSearch()">
     <button class="search-btn" onclick="doSearch()">Buscar</button>
   </div>
   <div class="results-list" id="results-list"></div>
 </div>
 
-<!-- ── Tablero partido ── -->
+<!-- ââ Tablero partido ââ -->
 <div id="screen-match">
   <div class="scorebar">
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
-      <div class="team-name home" id="name-home">—</div>
+      <div class="team-name home" id="name-home">â</div>
     </div>
     <div style="display:flex;align-items:center;gap:6px">
       <div class="score-num" id="score-home">0</div>
-      <div class="score-sep">–</div>
+      <div class="score-sep">â</div>
       <div class="score-num" id="score-away">0</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">
-      <div class="team-name away" id="name-away">—</div>
+      <div class="team-name away" id="name-away">â</div>
     </div>
     <div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);text-align:center">
-      <div class="minute-badge" id="minute-badge">—</div>
+      <div class="minute-badge" id="minute-badge">â</div>
       <div class="competition-label" id="competition-label"></div>
     </div>
   </div>
@@ -287,15 +287,15 @@
         <div class="anim-overlay" id="anim-overlay"></div>
         <div class="field-final-overlay" id="field-final-overlay">
           <div class="final-confetti" id="final-confetti"></div>
-          <div class="final-badge">⚽ PARTIDO FINALIZADO</div>
+          <div class="final-badge">â½ PARTIDO FINALIZADO</div>
           <div class="final-teams-row">
-            <div class="final-team-name" id="final-home-name">—</div>
+            <div class="final-team-name" id="final-home-name">â</div>
             <div class="final-score-block">
               <div class="final-score-num" id="final-score-home">0</div>
-              <div class="final-score-sep">—</div>
+              <div class="final-score-sep">â</div>
               <div class="final-score-num" id="final-score-away">0</div>
             </div>
-            <div class="final-team-name" id="final-away-name">—</div>
+            <div class="final-team-name" id="final-away-name">â</div>
           </div>
           <div class="final-winner-label" id="final-winner-label"></div>
           <div class="final-competition" id="final-competition"></div>
@@ -308,18 +308,18 @@
           <rect x="240" y="0" width="60" height="420" fill="rgba(0,0,0,0.04)"/>
           <rect x="360" y="0" width="60" height="420" fill="rgba(0,0,0,0.04)"/>
           <rect x="480" y="0" width="60" height="420" fill="rgba(0,0,0,0.04)"/>
-          <!-- Líneas -->
+          <!-- LÃ­neas -->
           <rect x="20" y="14" width="560" height="392" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <line x1="300" y1="14" x2="300" y2="406" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <circle cx="300" cy="210" r="50" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <circle cx="300" cy="210" r="3" fill="rgba(255,255,255,0.6)"/>
-          <!-- Áreas izq -->
+          <!-- Ãreas izq -->
           <rect x="20" y="130" width="88" height="160" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <rect x="20" y="168" width="38" height="84" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <path d="M108 152 Q148 210 108 268" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
           <rect x="8" y="186" width="12" height="48" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
           <circle cx="80" cy="210" r="2.5" fill="rgba(255,255,255,0.6)"/>
-          <!-- Áreas der -->
+          <!-- Ãreas der -->
           <rect x="492" y="130" width="88" height="160" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <rect x="542" y="168" width="38" height="84" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <path d="M492 152 Q452 210 492 268" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
@@ -328,31 +328,40 @@
           <!-- Jugadores (renderizados por JS) -->
           <g id="players-home"></g>
           <g id="players-away"></g>
-          <!-- Balón -->
-          <text id="ball" x="300" y="213" font-size="13" text-anchor="middle" dominant-baseline="central">⚽</text>
+          <!-- BalÃ³n -->
+          <text id="ball" x="300" y="213" font-size="13" text-anchor="middle" dominant-baseline="central">â½</text>
         </svg>
       </div>
-      <div style="font-size:11px;color:var(--muted);text-align:center" id="formation-label">Esperando alineaciones…</div>
+      <div style="font-size:11px;color:var(--muted);text-align:center" id="formation-label">Esperando alineacionesâ¦</div>
     </div>
 
     <div class="right-panel">
-      <div class="tabs">
+      <div id="sportreto-bar" style="display:none;margin:0 0 12px;border-radius:12px;overflow:hidden;background:#00e5a0">
+  <button onclick="crearReto()" style="width:100%;border:none;background:transparent;padding:13px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+    <div style="text-align:left">
+      <div style="font-weight:700;font-size:14px;color:#0a0a0f">⚔️ SportReto — Reta a un amigo</div>
+      <div style="font-size:11px;color:#0a0a0f;opacity:.75;margin-top:2px">Elige 3 jugadores · Comparte por WhatsApp · Gana</div>
+    </div>
+    <span style="font-size:20px;color:#0a0a0f">&#8594;</span>
+  </button>
+</div>
+<div class="tabs">
         <div class="tab active" onclick="switchTab('eventos')">EVENTOS</div>
         <div class="tab" onclick="switchTab('stats')">STATS</div>
         <div class="tab" onclick="switchTab('once')">ONCE</div>
         <div class="tab" onclick="switchTab('h2h')">H2H</div>
-        <div class="tab" id="tab-btn-resumen" onclick="switchTab('resumen')" style="display:none">📊 RESUMEN</div>
+        <div class="tab" id="tab-btn-resumen" onclick="switchTab('resumen')" style="display:none">ð RESUMEN</div>
       </div>
       <div class="tab-content">
-        <div class="tab-pane active" id="tab-eventos"><div id="events-feed"><div class="loading">Esperando eventos…</div></div></div>
-        <div class="tab-pane" id="tab-stats"><div id="stats-content"><div class="loading">Cargando estadísticas…</div></div></div>
+        <div class="tab-pane active" id="tab-eventos"><div id="events-feed"><div class="loading">Esperando eventosâ¦</div></div></div>
+        <div class="tab-pane" id="tab-stats"><div id="stats-content"><div class="loading">Cargando estadÃ­sticasâ¦</div></div></div>
         <div class="tab-pane" id="tab-once">
           <div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:0.5px;margin-bottom:10px" id="lineup-home-title">LOCAL</div>
           <div id="lineup-home"></div>
           <div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:0.5px;margin:14px 0 10px" id="lineup-away-title">VISITANTE</div>
           <div id="lineup-away"></div>
         </div>
-        <div class="tab-pane" id="tab-h2h"><div id="h2h-content"><div class="loading">Cargando historial…</div></div></div>
+        <div class="tab-pane" id="tab-h2h"><div id="h2h-content"><div class="loading">Cargando historialâ¦</div></div></div>
         <div class="tab-pane" id="tab-resumen"><div id="resumen-content"></div></div>
       </div>
     </div>
@@ -360,10 +369,10 @@
 </div>
 
 <script>
-// ─────────────────────────────────────────────────────────────────
-// CONFIGURACIÓN
-// Cambia esta URL a la dirección de tu backend cuando lo despliegues
-// ─────────────────────────────────────────────────────────────────
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// CONFIGURACIÃN
+// Cambia esta URL a la direcciÃ³n de tu backend cuando lo despliegues
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const BACKEND_URL = 'https://livematch-backend-production.up.railway.app';
 
 // Estado local
@@ -374,7 +383,7 @@ const state = {
   awayColor: '#a50044',
 };
 
-// ── Conexión Socket.io ───────────────────────────────────────────
+// ââ ConexiÃ³n Socket.io âââââââââââââââââââââââââââââââââââââââââââ
 const socket = io(BACKEND_URL, {
   reconnection: true,
   reconnectionDelay: 2000,
@@ -382,10 +391,10 @@ const socket = io(BACKEND_URL, {
 });
 
 socket.on('connect', () => {
-  setStatus('connected', '● EN VIVO');
+  setStatus('connected', 'â EN VIVO');
   socket.emit('join-lobby');
 });
-socket.on('disconnect', () => setStatus('disconnected', '✕ DESCONECTADO'));
+socket.on('disconnect', () => setStatus('disconnected', 'â DESCONECTADO'));
 socket.on('connect_error', () => setStatus('connecting', 'RECONECTANDO'));
 
 function setStatus(cls, label) {
@@ -394,7 +403,7 @@ function setStatus(cls, label) {
   el.textContent = label;
 }
 
-// ── Lista de partidos en vivo ────────────────────────────────────
+// ââ Lista de partidos en vivo ââââââââââââââââââââââââââââââââââââ
 socket.on('live-matches', (matches) => {
   if (document.getElementById('screen-search').style.display !== 'none') {
     renderResults(matches);
@@ -405,8 +414,12 @@ socket.on('search-results', (results) => {
   renderResults(results);
 });
 
-// ── Eventos del partido ──────────────────────────────────────────
+// ââ Eventos del partido ââââââââââââââââââââââââââââââââââââââââââ
 socket.on('match-state', (matchData) => {
+    // SportReto tracking
+    window._retoMatchId = matchData.id || matchData.matchId || '';
+    window._retoMatchLabel = (matchData.home || matchData.homeTeam || '') + ' vs ' + (matchData.away || matchData.awayTeam || '');
+    var sbar = document.getElementById('sportreto-bar'); if(sbar) sbar.style.display='block';
   updateScoreboard(matchData);
 });
 
@@ -419,8 +432,8 @@ socket.on('animation', (anim) => {
 });
 
 socket.on('score-update', (score) => {
-  document.getElementById('score-home').textContent = score.home ?? '—';
-  document.getElementById('score-away').textContent = score.away ?? '—';
+  document.getElementById('score-home').textContent = score.home ?? 'â';
+  document.getElementById('score-away').textContent = score.away ?? 'â';
 });
 
 socket.on('minute', (min) => {
@@ -438,7 +451,7 @@ socket.on('match-summary', (data) => {
   renderMatchSummary(data);
 });
 
-// ── Contadores regresivos activos ────────────────────────────────
+// ââ Contadores regresivos activos ââââââââââââââââââââââââââââââââ
 let countdownTimers = [];
 
 function clearCountdowns() {
@@ -447,7 +460,7 @@ function clearCountdowns() {
 }
 
 function formatCountdown(ms) {
-  if (ms <= 0) return { text: '¡Ya!', urgent: true };
+  if (ms <= 0) return { text: 'Â¡Ya!', urgent: true };
   const totalSec = Math.floor(ms / 1000);
   const d = Math.floor(totalSec / 86400);
   const h = Math.floor((totalSec % 86400) / 3600);
@@ -467,19 +480,19 @@ function localDate(timestamp) {
   const today = new Date();
   const tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
   if (d.toDateString() === today.toDateString()) return 'Hoy';
-  if (d.toDateString() === tomorrow.toDateString()) return 'Mañana';
+  if (d.toDateString() === tomorrow.toDateString()) return 'MaÃ±ana';
   return d.toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
-// ── Búsqueda ─────────────────────────────────────────────────────
-// ── Alias de selecciones nacionales y ligas ──────────────────────
+// ââ BÃºsqueda âââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ââ Alias de selecciones nacionales y ligas ââââââââââââââââââââââ
 const SEARCH_ALIASES = {
-  'colombia': ['dimayor', 'águilas', 'bucaramanga', 'santa fe', 'cúcuta', 'tolima', 'cali', 'jaguares', 'valledupar', 'chicó'],
+  'colombia': ['dimayor', 'Ã¡guilas', 'bucaramanga', 'santa fe', 'cÃºcuta', 'tolima', 'cali', 'jaguares', 'valledupar', 'chicÃ³'],
   'argentina': ['argentina', 'afa'],
   'brasil': ['brazil', 'brasileirao', 'serie a bra'],
   'brazil': ['brazil', 'brasileirao'],
   'mexico': ['mexico', 'liga mx', 'liga de expansion'],
-  'perú': ['peru', 'liga 1'],
+  'perÃº': ['peru', 'liga 1'],
   'peru': ['peru', 'liga 1'],
   'chile': ['chile', 'primera division'],
   'ecuador': ['ecuador', 'liga pro'],
@@ -487,7 +500,7 @@ const SEARCH_ALIASES = {
   'venezuela': ['venezuela', 'liga futve'],
   'paraguay': ['paraguay', 'division profesional'],
   'bolivia': ['bolivia', 'division profesional bol'],
-  'españa': ['laliga', 'spain', 'primera division esp'],
+  'espaÃ±a': ['laliga', 'spain', 'primera division esp'],
   'spain': ['laliga', 'spain'],
   'inglaterra': ['premier league', 'england', 'championship'],
   'england': ['premier league', 'england'],
@@ -500,7 +513,7 @@ const SEARCH_ALIASES = {
   'portugal': ['liga portugal', 'portugal'],
   'usa': ['mls', 'usa', 'usl'],
   'estados unidos': ['mls', 'usa'],
-  'japón': ['j1 league', 'j league'],
+  'japÃ³n': ['j1 league', 'j league'],
   'japon': ['j1 league', 'j league'],
   'corea': ['k league', 'korea'],
 };
@@ -516,7 +529,7 @@ function doSearch() {
   const q = document.getElementById('search-input').value.trim();
   if (!q) return;
   state.lastQuery = q;
-  document.getElementById('results-list').innerHTML = '<div class="loading">Buscando…</div>';
+  document.getElementById('results-list').innerHTML = '<div class="loading">Buscandoâ¦</div>';
 
   const queryTerms = expandQuery(q);
 
@@ -535,7 +548,7 @@ function doSearch() {
       if (filtered.length > 0) {
         renderResults(filtered, q);
       } else {
-        // Sin resultados hoy — buscar próximos días via socket
+        // Sin resultados hoy â buscar prÃ³ximos dÃ­as via socket
         socket.emit('search', { query: q }, (results) => {
           renderResults(results || [], q);
         });
@@ -558,38 +571,38 @@ function renderResults(matches, query) {
 
   let html = '';
 
-  // ── Partidos en vivo ──
+  // ââ Partidos en vivo ââ
   if (live.length) {
     html += live.map(m => {
-      const scoreStr = (m.score.home !== null && m.score.away !== null) ? m.score.home + ' – ' + m.score.away : '– –';
+      const scoreStr = (m.score.home !== null && m.score.away !== null) ? m.score.home + ' â ' + m.score.away : 'â â';
       return `<div class="result-card" onclick="openMatch(${JSON.stringify(m).replace(/"/g,'&quot;')})">
         <div>
           <div class="result-teams">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
-          <div class="result-meta">${m.competition} · <span class="status-badge badge-live"><span class="live-dot"></span>${m.minute ? m.minute+"'" : 'EN VIVO'}</span></div>
+          <div class="result-meta">${m.competition} Â· <span class="status-badge badge-live"><span class="live-dot"></span>${m.minute ? m.minute+"'" : 'EN VIVO'}</span></div>
         </div>
         <div class="result-score">${scoreStr}</div>
       </div>`;
     }).join('');
   }
 
-  // ── Terminados ──
+  // ââ Terminados ââ
   if (finished.length) {
     html += finished.map(m => {
-      const scoreStr = m.score.home + ' – ' + m.score.away;
+      const scoreStr = m.score.home + ' â ' + m.score.away;
       return `<div class="result-card" onclick="openMatch(${JSON.stringify(m).replace(/"/g,'&quot;')})">
         <div>
           <div class="result-teams">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
-          <div class="result-meta">${m.competition} · <span class="status-badge badge-fin">FIN</span></div>
+          <div class="result-meta">${m.competition} Â· <span class="status-badge badge-fin">FIN</span></div>
         </div>
         <div class="result-score" style="font-size:16px;color:var(--muted)">${scoreStr}</div>
       </div>`;
     }).join('');
   }
 
-  // ── Próximos con cuenta regresiva ──
+  // ââ PrÃ³ximos con cuenta regresiva ââ
   if (upcoming.length) {
     html += `<div class="upcoming-section">
-      <div class="upcoming-title">⏰ Próximos partidos</div>`;
+      <div class="upcoming-title">â° PrÃ³ximos partidos</div>`;
 
     upcoming.forEach((m, idx) => {
       const ts = m.startTimestamp || (m.utcDate ? Math.floor(new Date(m.utcDate).getTime()/1000) : null);
@@ -607,7 +620,7 @@ function renderResults(matches, query) {
         const initial = formatCountdown(ts * 1000 - Date.now());
         countdownHtml = `<div class="countdown-wrap">
           <div class="countdown ${initial.urgent ? 'urgent' : ''}" id="${cdId}">${initial.text}</div>
-          <div class="countdown-label">${dateStr} · ${timeStr}</div>
+          <div class="countdown-label">${dateStr} Â· ${timeStr}</div>
         </div>`;
       } else {
         countdownHtml = `<div class="countdown-wrap">
@@ -632,7 +645,7 @@ function renderResults(matches, query) {
           if (!cdEl) { clearInterval(timer); return; }
           const remaining = ts * 1000 - Date.now();
           if (remaining <= 0) {
-            cdEl.textContent = '¡Iniciando!';
+            cdEl.textContent = 'Â¡Iniciando!';
             cdEl.classList.add('urgent');
             clearInterval(timer);
             return;
@@ -652,21 +665,21 @@ function renderResults(matches, query) {
     html += '</div>';
   }
 
-  // ── Sin resultados ──
+  // ââ Sin resultados ââ
   if (!live.length && !finished.length && !upcoming.length) {
     html = `<div class="no-results">No se encontraron partidos para "${query}"</div>
     <div class="no-upcoming">
       Intenta buscar directamente el nombre de la liga:<br>
-      <strong>Premier League · LaLiga · Champions · Serie A</strong><br><br>
-      Los partidos se muestran el mismo día que se juegan.<br>
-      Horarios Colombia: sábados y domingos 8am–4pm · martes y miércoles 2pm–4pm
+      <strong>Premier League Â· LaLiga Â· Champions Â· Serie A</strong><br><br>
+      Los partidos se muestran el mismo dÃ­a que se juegan.<br>
+      Horarios Colombia: sÃ¡bados y domingos 8amâ4pm Â· martes y miÃ©rcoles 2pmâ4pm
     </div>`;
   }
 
   el.innerHTML = html;
 }
 
-// ── Abrir partido ─────────────────────────────────────────────────
+// ââ Abrir partido âââââââââââââââââââââââââââââââââââââââââââââââââ
 function openMatch(match) {
   state.matchId = match.id;
   state.events = [];
@@ -676,7 +689,7 @@ function openMatch(match) {
   document.getElementById('screen-match').style.display = 'block';
   document.getElementById('back-btn').style.display = 'inline-block';
 
-  // Resetear pestaña RESUMEN al abrir un partido nuevo
+  // Resetear pestaÃ±a RESUMEN al abrir un partido nuevo
   const tabBtnResumen = document.getElementById('tab-btn-resumen');
   if (tabBtnResumen) tabBtnResumen.style.display = 'none';
   const resumenContent = document.getElementById('resumen-content');
@@ -698,11 +711,11 @@ function openMatch(match) {
     sofascoreId: match.source === 'sofascore' ? match.id : null,
   });
 
-  // Si el partido terminó, cargar resumen vía REST (fallback si socket no lo envía)
+  // Si el partido terminÃ³, cargar resumen vÃ­a REST (fallback si socket no lo envÃ­a)
   if (match.status === 'FINISHED') {
     const sfId = match.id;
     setTimeout(() => {
-      // Solo cargar si aún no se renderizó por socket
+      // Solo cargar si aÃºn no se renderizÃ³ por socket
       const resumenEl = document.getElementById('resumen-content');
       if (resumenEl && resumenEl.innerHTML.trim() === '') {
         fetch(BACKEND_URL + '/api/match/' + sfId + '/summary')
@@ -735,13 +748,13 @@ function goToSearch() {
   document.getElementById('back-btn').style.display = 'none';
 }
 
-// ── Actualizar marcador ───────────────────────────────────────────
+// ââ Actualizar marcador âââââââââââââââââââââââââââââââââââââââââââ
 function updateScoreboard(m) {
-  document.getElementById('name-home').textContent = m.homeTeam?.name || '—';
-  document.getElementById('name-away').textContent = m.awayTeam?.name || '—';
-  document.getElementById('score-home').textContent = m.score?.home ?? '—';
-  document.getElementById('score-away').textContent = m.score?.away ?? '—';
-  document.getElementById('minute-badge').textContent = m.minute ? m.minute + "'" : m.status === 'FINISHED' ? 'FIN' : '—';
+  document.getElementById('name-home').textContent = m.homeTeam?.name || 'â';
+  document.getElementById('name-away').textContent = m.awayTeam?.name || 'â';
+  document.getElementById('score-home').textContent = m.score?.home ?? 'â';
+  document.getElementById('score-away').textContent = m.score?.away ?? 'â';
+  document.getElementById('minute-badge').textContent = m.minute ? m.minute + "'" : m.status === 'FINISHED' ? 'FIN' : 'â';
   document.getElementById('competition-label').textContent = m.competition || '';
 
   // Colores del equipo
@@ -749,7 +762,7 @@ function updateScoreboard(m) {
   if (m.awayTeam?.colors?.primary) state.awayColor = '#' + m.awayTeam.colors.primary;
 }
 
-// ── Eventos ───────────────────────────────────────────────────────
+// ââ Eventos âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function addEvent(inc) {
   state.events.unshift(inc);
   renderEvents();
@@ -757,16 +770,16 @@ function addEvent(inc) {
 
 function renderEvents() {
   const iconMap = {
-    'gol': '⚽', 'gol-en-contra': '⚽', 'tarjeta-amarilla': '🟨',
-    'tarjeta-roja': '🟥', 'cambio': '🔄', 'var': '📺',
-    'penal-fallado': '❌', 'corner': '🚩', 'atajada': '🧤',
+    'gol': 'â½', 'gol-en-contra': 'â½', 'tarjeta-amarilla': 'ð¨',
+    'tarjeta-roja': 'ð¥', 'cambio': 'ð', 'var': 'ðº',
+    'penal-fallado': 'â', 'corner': 'ð©', 'atajada': 'ð§¤',
   };
   const feed = document.getElementById('events-feed');
-  if (!state.events.length) { feed.innerHTML = '<div class="loading">Esperando eventos…</div>'; return; }
+  if (!state.events.length) { feed.innerHTML = '<div class="loading">Esperando eventosâ¦</div>'; return; }
   feed.innerHTML = state.events.map(e => `
     <div class="event-item">
       <div class="event-min">${e.minute}'</div>
-      <div class="event-icon">${iconMap[e.type] || '•'}</div>
+      <div class="event-icon">${iconMap[e.type] || 'â¢'}</div>
       <div class="event-text">
         <strong>${e.player || ''}</strong>
         <span>${e.description || e.assist ? (e.assist ? 'Asistencia: '+e.assist : '') : ''}</span>
@@ -774,10 +787,10 @@ function renderEvents() {
     </div>`).join('');
 }
 
-// ── Stats ─────────────────────────────────────────────────────────
+// ââ Stats âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderStats(stats) {
   const el = document.getElementById('stats-content');
-  if (!stats.length) { el.innerHTML = '<div class="loading">Sin estadísticas aún</div>'; return; }
+  if (!stats.length) { el.innerHTML = '<div class="loading">Sin estadÃ­sticas aÃºn</div>'; return; }
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;padding:6px 0 12px;border-bottom:1px solid var(--border);margin-bottom:10px;color:var(--muted)">
       <span style="color:var(--accent)" id="sh-home-label">LOCAL</span>
@@ -805,11 +818,11 @@ function renderStats(stats) {
   `;
 }
 
-// ── Alineaciones ──────────────────────────────────────────────────
+// ââ Alineaciones ââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderLineups(lineups) {
   const { home, away } = lineups;
   if (home) {
-    document.getElementById('lineup-home-title').textContent = 'LOCAL · ' + (home.formation || '');
+    document.getElementById('lineup-home-title').textContent = 'LOCAL Â· ' + (home.formation || '');
     document.getElementById('lineup-home').innerHTML = home.players
       .filter(p => !p.substitute)
       .map(p => `<div class="form-row"><span class="num">${p.number}</span><span style="flex:1">${p.name}</span><span class="pos">${p.position}</span></div>`)
@@ -817,7 +830,7 @@ function renderLineups(lineups) {
     if (home.formation) renderPlayers('players-home', home.players, state.homeColor, false);
   }
   if (away) {
-    document.getElementById('lineup-away-title').textContent = 'VISITANTE · ' + (away.formation || '');
+    document.getElementById('lineup-away-title').textContent = 'VISITANTE Â· ' + (away.formation || '');
     document.getElementById('lineup-away').innerHTML = away.players
       .filter(p => !p.substitute)
       .map(p => `<div class="form-row"><span class="num">${p.number}</span><span style="flex:1">${p.name}</span><span class="pos">${p.position}</span></div>`)
@@ -826,7 +839,7 @@ function renderLineups(lineups) {
   }
   const hl = home?.formation || '';
   const al = away?.formation || '';
-  document.getElementById('formation-label').textContent = hl || al ? `← Local ${hl}  |  ${al} Visitante →` : '';
+  document.getElementById('formation-label').textContent = hl || al ? `â Local ${hl}  |  ${al} Visitante â` : '';
 }
 
 function renderPlayers(groupId, players, color, flipSide) {
@@ -841,7 +854,7 @@ function renderPlayers(groupId, players, color, flipSide) {
       x = flipSide ? 600 - (p.coords.x / 100 * 560 + 20) : p.coords.x / 100 * 560 + 20;
       y = p.coords.y / 100 * 392 + 14;
     } else {
-      // Fallback: distribuir por posición
+      // Fallback: distribuir por posiciÃ³n
       const posMap = { GK:[0.08,0.5], DF:[0.22,0.5], MF:[0.5,0.5], FW:[0.72,0.5] };
       const base = posMap[p.position] || [0.4, 0.5];
       x = flipSide ? (1 - base[0]) * 560 + 20 : base[0] * 560 + 20;
@@ -857,21 +870,21 @@ function renderPlayers(groupId, players, color, flipSide) {
   }).join('');
 }
 
-// ── H2H ───────────────────────────────────────────────────────────
+// ââ H2H âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderH2H(matches) {
   const el = document.getElementById('h2h-content');
   if (!matches.length) { el.innerHTML = '<div class="loading">Sin historial disponible</div>'; return; }
-  el.innerHTML = `<div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:0.5px;margin-bottom:10px">ÚLTIMOS ENFRENTAMIENTOS</div>` +
+  el.innerHTML = `<div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:0.5px;margin-bottom:10px">ÃLTIMOS ENFRENTAMIENTOS</div>` +
     matches.map(m => `
       <div class="h2h-item">
         <div>${m.homeTeam.name} vs ${m.awayTeam.name}</div>
-        <div class="h2h-score">${m.score.home} – ${m.score.away}</div>
+        <div class="h2h-score">${m.score.home} â ${m.score.away}</div>
       </div>`).join('');
 }
 
-// ── Resumen post-partido ─────────────────────────────────────────
+// ââ Resumen post-partido âââââââââââââââââââââââââââââââââââââââââ
 function renderMatchSummary(data) {
-  // Mostrar pestaña RESUMEN
+  // Mostrar pestaÃ±a RESUMEN
   const tabBtn = document.getElementById('tab-btn-resumen');
   if (tabBtn) { tabBtn.style.display = ''; switchTab('resumen'); }
 
@@ -880,19 +893,19 @@ function renderMatchSummary(data) {
 
   let html = '';
 
-  // ── Jugador del partido ──
+  // ââ Jugador del partido ââ
   const pom = data.bestPlayers?.playerOfMatch;
   if (pom && pom.name) {
     const ratingColor = pom.rating >= 8 ? '#3ecf8e' : pom.rating >= 7 ? '#f0c040' : '#e87040';
     html += `<div class="summary-section pom-card">
-      <div class="pom-label">⭐ JUGADOR DEL PARTIDO</div>
+      <div class="pom-label">â­ JUGADOR DEL PARTIDO</div>
       <div class="pom-name">${pom.name}</div>
       ${pom.rating ? `<div class="pom-rating" style="color:${ratingColor}">${pom.rating}</div>` : ''}
       <div style="font-size:10px;color:var(--muted);margin-top:4px">${pom.teamSide === 'home' ? (data.homeTeam?.name || 'Local') : (data.awayTeam?.name || 'Visitante')}</div>
     </div>`;
   }
 
-  // ── Mejores jugadores por equipo ──
+  // ââ Mejores jugadores por equipo ââ
   const homePlayers = data.bestPlayers?.home || [];
   const awayPlayers = data.bestPlayers?.away || [];
   if (homePlayers.length || awayPlayers.length) {
@@ -907,13 +920,13 @@ function renderMatchSummary(data) {
       <div class="player-row">
         <div style="flex:1">
           <div class="player-name">${p.name}</div>
-          <div class="player-stats">${p.goals ? '⚽ ' + p.goals + ' gol' + (p.goals > 1 ? 'es' : '') : ''}${p.assists ? ' 🎯 ' + p.assists : ''} <span style="color:var(--muted)">${p.position || ''}</span></div>
+          <div class="player-stats">${p.goals ? 'â½ ' + p.goals + ' gol' + (p.goals > 1 ? 'es' : '') : ''}${p.assists ? ' ð¯ ' + p.assists : ''} <span style="color:var(--muted)">${p.position || ''}</span></div>
         </div>
         ${p.rating ? `<div class="player-rating" style="color:${ratingColor(p.rating)}">${p.rating}</div>` : ''}
       </div>`;
 
     html += `<div class="summary-section">
-      <div class="summary-title">🏆 MEJORES JUGADORES</div>
+      <div class="summary-title">ð MEJORES JUGADORES</div>
       <div class="players-grid">
         <div>
           <div class="players-col-title" style="color:var(--accent)">${data.homeTeam?.name || 'LOCAL'}</div>
@@ -927,29 +940,29 @@ function renderMatchSummary(data) {
     </div>`;
   }
 
-  // ── Resultado final ──
+  // ââ Resultado final ââ
   if (data.score) {
     const result = data.score.home > data.score.away ? data.homeTeam?.name + ' gana' :
                    data.score.away > data.score.home ? data.awayTeam?.name + ' gana' : 'Empate';
     html += `<div class="summary-section" style="background:rgba(255,255,255,0.03);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
       <span style="font-size:13px;font-weight:700;color:var(--text)">${data.homeTeam?.name || 'Local'}</span>
-      <span style="font-size:20px;font-weight:900;color:var(--accent)">${data.score.home} – ${data.score.away}</span>
+      <span style="font-size:20px;font-weight:900;color:var(--accent)">${data.score.home} â ${data.score.away}</span>
       <span style="font-size:13px;font-weight:700;color:var(--text)">${data.awayTeam?.name || 'Visitante'}</span>
     </div>`;
   }
 
-  // ── Eventos del partido (goles y tarjetas) ──
+  // ââ Eventos del partido (goles y tarjetas) ââ
   const events = (data.events || []).filter(e => ['gol','gol-en-contra','tarjeta-roja','tarjeta-amarilla','cambio'].includes(e.type));
   const keyEvents = events.filter(e => ['gol','gol-en-contra','tarjeta-roja','tarjeta-amarilla'].includes(e.type));
   if (keyEvents.length) {
-    const iconMap = { 'gol': '⚽', 'gol-en-contra': '⚽🔴', 'tarjeta-amarilla': '🟨', 'tarjeta-roja': '🟥' };
+    const iconMap = { 'gol': 'â½', 'gol-en-contra': 'â½ð´', 'tarjeta-amarilla': 'ð¨', 'tarjeta-roja': 'ð¥' };
     html += `<div class="summary-section">
-      <div class="summary-title">📋 EVENTOS CLAVE</div>
+      <div class="summary-title">ð EVENTOS CLAVE</div>
       ${keyEvents.map(e => {
         const teamName = e.team === 'home' ? (data.homeTeam?.name || 'Local') : (data.awayTeam?.name || 'Visitante');
         return `<div class="event-feed-item">
           <span class="event-min-sm">${e.minute}'${e.minuteExtra ? '+'+e.minuteExtra : ''}</span>
-          <span>${iconMap[e.type] || '•'}</span>
+          <span>${iconMap[e.type] || 'â¢'}</span>
           <span style="flex:1;font-weight:600">${e.player || '?'}</span>
           <span style="font-size:11px;color:var(--muted);text-align:right">${teamName}</span>
         </div>`;
@@ -957,7 +970,7 @@ function renderMatchSummary(data) {
     </div>`;
   }
 
-  el.innerHTML = html || '<div class="loading">Cargando datos del partido…</div>';
+  el.innerHTML = html || '<div class="loading">Cargando datos del partidoâ¦</div>';
 
   // Cargar tabla de posiciones por separado si hay competitionId
   if (data.competitionId) {
@@ -976,7 +989,7 @@ async function loadStandings(competitionId, homeTeam, awayTeam, containerEl) {
     const awayId = awayTeam?.id;
 
     const tableHtml = `<div class="summary-section" style="margin-top:16px">
-      <div class="summary-title">📊 TABLA DE POSICIONES</div>
+      <div class="summary-title">ð TABLA DE POSICIONES</div>
       <table class="standings-table">
         <thead><tr>
           <th>#</th><th style="text-align:left">Equipo</th>
@@ -1002,7 +1015,7 @@ async function loadStandings(competitionId, homeTeam, awayTeam, containerEl) {
   } catch(e) { /* silently fail */ }
 }
 
-// ── Animaciones ───────────────────────────────────────────────────
+// ââ Animaciones âââââââââââââââââââââââââââââââââââââââââââââââââââ
 function fireAnimation(anim) {
   const overlay = document.getElementById('anim-overlay');
 
@@ -1022,13 +1035,13 @@ function fireAnimation(anim) {
   }
 
   const toastMessages = {
-    'goal':        { text: '⚽ ¡GOOOOOL!',          color: '#f0c040' },
-    'own-goal':    { text: '⚽ Gol en contra',       color: '#e87040' },
-    'yellow-card': { text: '🟨 Tarjeta amarilla',    color: '#f5c518' },
-    'red-card':    { text: '🟥 ¡Expulsión!',         color: '#e84040' },
-    'substitution':{ text: '🔄 Sustitución',         color: '#3ecf8e' },
-    'missed-pen':  { text: '❌ Penal fallado',        color: '#7a7f96' },
-    'var':         { text: '📺 Revisión VAR',         color: '#7a7f96' },
+    'goal':        { text: 'â½ Â¡GOOOOOL!',          color: '#f0c040' },
+    'own-goal':    { text: 'â½ Gol en contra',       color: '#e87040' },
+    'yellow-card': { text: 'ð¨ Tarjeta amarilla',    color: '#f5c518' },
+    'red-card':    { text: 'ð¥ Â¡ExpulsiÃ³n!',         color: '#e84040' },
+    'substitution':{ text: 'ð SustituciÃ³n',         color: '#3ecf8e' },
+    'missed-pen':  { text: 'â Penal fallado',        color: '#7a7f96' },
+    'var':         { text: 'ðº RevisiÃ³n VAR',         color: '#7a7f96' },
   };
 
   const msg = toastMessages[anim.type];
@@ -1043,14 +1056,14 @@ function fireAnimation(anim) {
   }
 }
 
-// ── Tabs ──────────────────────────────────────────────────────────
+// ââ Tabs ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function switchTab(name) {
   const names = ['eventos','stats','once','h2h','resumen'];
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', names[i] === name));
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
 }
 
-// ── Pantalla Partido Finalizado ──────────────────────────────────
+// ââ Pantalla Partido Finalizado ââââââââââââââââââââââââââââââââââ
 function showFinalScreen(match) {
   const overlay = document.getElementById('field-final-overlay');
   if (!overlay) return;
@@ -1077,14 +1090,14 @@ function showFinalScreen(match) {
   // Etiqueta ganador/empate
   const winnerEl = document.getElementById('final-winner-label');
   if (isDraw) {
-    winnerEl.textContent = '⚖️ EMPATE';
+    winnerEl.textContent = 'âï¸ EMPATE';
     winnerEl.className = 'final-winner-label final-winner-draw';
   } else {
-    winnerEl.textContent = '🏆 GANADOR: ' + (homeWins ? hName : aName).toUpperCase();
+    winnerEl.textContent = 'ð GANADOR: ' + (homeWins ? hName : aName).toUpperCase();
     winnerEl.className = 'final-winner-label final-winner-win';
   }
 
-  // Competición
+  // CompeticiÃ³n
   const compEl = document.getElementById('final-competition');
   if (compEl) compEl.textContent = match.competition || '';
 
@@ -1126,7 +1139,7 @@ function spawnConfetti() {
   }
 }
 
-// ── Balón ─────────────────────────────────────────────────────────
+// ââ BalÃ³n âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function moveBall() {
   const ball = document.getElementById('ball');
   const x = 80 + Math.random() * 440;
@@ -1135,8 +1148,14 @@ function moveBall() {
   ball.setAttribute('y', y);
 }
 
-// Mover balón suavemente cada 8s
+// Mover balÃ³n suavemente cada 8s
 setInterval(moveBall, 8000);
+
+  function crearReto() {
+    var mid = window._retoMatchId || '';
+    var lbl = window._retoMatchLabel || 'Partido';
+    window.open('/reto/crear-ui?matchId=' + encodeURIComponent(mid) + '&label=' + encodeURIComponent(lbl), '_blank');
+  }
 </script>
 </body>
 </html>
