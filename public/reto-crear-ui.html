@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SportReto — Crear reto</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d14;color:#eeeef5;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:20px 16px 60px}
+.logo{font-size:22px;font-weight:800;color:#00e5a0;margin-bottom:4px}.logo span{color:#eeeef5}
+.match-label{font-size:12px;color:#9898b0;margin-bottom:24px}
+.section{font-size:10px;letter-spacing:2px;color:#00e5a0;margin-bottom:10px;text-transform:uppercase;font-weight:600}
+.player-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:#14141e;border:1px solid rgba(255,255,255,.08);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.player-row:hover{border-color:rgba(255,255,255,.16)}
+.player-row.sel{border-color:#00e5a0;background:rgba(0,229,160,.08)}
+.player-row.disabled{opacity:.3;pointer-events:none}
+.pos{font-size:10px;color:#6b6b85;background:#1c1c2a;border:1px solid rgba(255,255,255,.08);padding:2px 6px;border-radius:3px;margin-right:10px}
+.rating{font-size:11px;color:#9898b0}.rating.hi{color:#00e5a0}
+.sel-badge{font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(0,229,160,.15);color:#00e5a0}
+.counter{font-size:13px;color:#9898b0;margin-bottom:16px;text-align:center}
+.counter span{color:#00e5a0;font-weight:700}
+.btn{width:100%;padding:14px;background:#00e5a0;color:#0d0d14;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:1px;margin-top:8px;transition:opacity .15s}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn:hover:not(:disabled){opacity:.88}
+.loading{text-align:center;padding:40px;color:#6b6b85}
+.error{text-align:center;padding:40px;color:#ff4d6d}
+</style>
+</head>
+<body>
+<div class="logo">Sport<span>Reto</span></div>
+<div class="match-label" id="match-label">Cargando partido...</div>
+
+<div id="content" class="loading">Cargando jugadores...</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+const params = new URLSearchParams(window.location.search);
+const MATCH_ID = params.get('matchId') || '';
+const MATCH_LABEL = params.get('label') || 'Partido';
+const BASE = window.location.origin;
+
+document.getElementById('match-label').textContent = MATCH_LABEL;
+
+let selected = [];
+let players = [];
+
+// Load players from the match via socket
+const socket = io(BASE);
+socket.emit('join-match', MATCH_ID);
+
+socket.on('match-enrichment', function(data) {
+  if (!data || !data.lineups) return;
+  extractPlayers(data);
+});
+
+socket.on('match-state', function(data) {
+  if (players.length === 0 && data && data.players) extractPlayers(data);
+});
+
+// Fallback: load from SofaScore API endpoint if available
+setTimeout(function() {
+  if (players.length === 0) {
+    fetch(BASE + '/api/match/' + MATCH_ID + '/players')
+      .then(r => r.json())
+      .then(d => { if(d && d.players) extractPlayers({lineups: d}); })
+      .catch(() => showFallbackPlayers());
+  }
+}, 3000);
+
+function extractPlayers(data) {
+  const all = [];
+  const home = (data.lineups && (data.lineups.home || data.lineups.homeTeam)) || [];
+  const away = (data.lineups && (data.lineups.away || data.lineups.awayTeam)) || [];
+  
+  (Array.isArray(home) ? home : Object.values(home)).forEach(p => {
+    if(p && p.id) all.push({id:String(p.id), name: p.name||p.player?.name||'Jugador', pos: p.position||p.pos||'?', rating: p.rating||p.statistics?.rating||7.0, team:'home'});
+  });
+  (Array.isArray(away) ? away : Object.values(away)).forEach(p => {
+    if(p && p.id) all.push({id:String(p.id), name: p.name||p.player?.name||'Jugador', pos: p.position||p.pos||'?', rating: p.rating||p.statistics?.rating||7.0, team:'away'});
+  });
+
+  if (all.length > 0) { players = all; renderPlayers(); }
+  else showFallbackPlayers();
+}
+
+function showFallbackPlayers() {
+  document.getElementById('content').innerHTML = '<div class="error">No se pudieron cargar los jugadores.<br><br>El partido aún no tiene alineaciones confirmadas.<br>Intenta cuando el partido esté por empezar.</div>';
+}
+
+function renderPlayers() {
+  const el = document.getElementById('content');
+  el.innerHTML = '<div class="section">Elige tus 3 jugadores</div>' +
+    '<div class="counter">Seleccionados: <span id="count">0</span> / 3</div>' +
+    '<div id="player-list"></div>' +
+    '<button class="btn" id="btn-crear" disabled onclick="crearReto()">CREAR RETO Y COMPARTIR</button>';
+  renderList();
+}
+
+function renderList() {
+  const list = document.getElementById('player-list');
+  if(!list) return;
+  list.innerHTML = players.map(p => {
+    const isSel = selected.includes(p.id);
+    const isFull = selected.length >= 3 && !isSel;
+    return '<div class="player-row' + (isSel?' sel':'') + (isFull?' disabled':'') + '" onclick="toggle('' + p.id + '')">' +
+      '<div style="display:flex;align-items:center"><span class="pos">' + p.pos + '</span><span style="font-size:13px;font-weight:500">' + p.name + '</span></div>' +
+      '<div style="display:flex;align-items:center;gap:8px">' +
+        '<span class="rating' + (parseFloat(p.rating)>=8?' hi':'') + '">' + (parseFloat(p.rating)||'').toFixed(1) + '</span>' +
+        (isSel ? '<span class="sel-badge">OK</span>' : '') +
+      '</div></div>';
+  }).join('');
+  const count = document.getElementById('count');
+  if(count) count.textContent = selected.length;
+  const btn = document.getElementById('btn-crear');
+  if(btn) btn.disabled = selected.length !== 3;
+}
+
+function toggle(id) {
+  if(selected.includes(id)) selected = selected.filter(x=>x!==id);
+  else if(selected.length < 3) selected.push(id);
+  renderList();
+}
+
+async function crearReto() {
+  const btn = document.getElementById('btn-crear');
+  btn.disabled = true;
+  btn.textContent = 'Creando reto...';
+  try {
+    const res = await fetch(BASE + '/reto/crear', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        matchId: MATCH_ID,
+        matchLabel: MATCH_LABEL,
+        jugadores: selected,
+        nombre: 'Yo'
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    // Save token for this user
+    localStorage.setItem('rt_' + data.retoId, data.userToken);
+    // Open WhatsApp share
+    window.open(data.whatsapp, '_blank');
+    // Redirect to reto page
+    setTimeout(() => { window.location.href = '/reto/' + data.retoId; }, 800);
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'CREAR RETO Y COMPARTIR';
+    alert('Error: ' + e.message);
+  }
+}
+</script>
+</body>
+</html>
