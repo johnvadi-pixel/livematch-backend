@@ -253,7 +253,7 @@
 <!-- ââ Pantalla búsqueda ââ -->
 <div id="screen-search">
   <div class="search-title">Partidos en vivo</div>
-  <div class="search-sub">Busca un equipo, liga o selección</div>
+  <div class="search-sub">Busca un equipo, liga, selección nacional o torneo</div>
   <div class="search-box">
     <input class="search-input" id="search-input" type="text" placeholder="Real Madrid, Premier League, Colombiaâ¦" onkeydown="if(event.key==='Enter') doSearch()">
     <button class="search-btn" onclick="doSearch()">Buscar</button>
@@ -670,7 +670,7 @@ function renderResults(matches, query) {
     html = `<div class="no-results">No se encontraron partidos para "${query}"</div>
     <div class="no-upcoming">
       Intenta buscar directamente el nombre de la liga:<br>
-      <strong>Premier League · LaLiga · Champions · Serie A</strong><br><br>
+      <strong>Premier League · LaLiga · Champions · Eliminatorias · Francia · Colombia · Argentina</strong><br><br>
       Los partidos se muestran el mismo día que se juegan.<br>
       Horarios Colombia: sábados y domingos 8amâ4pm · martes y miércoles 2pmâ4pm
     </div>`;
