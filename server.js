@@ -100,6 +100,31 @@ io.on('connection', (socket) => {
   socket.on('subscribe-match', async ({ matchId, sofascoreId }) => {
     if (!matchId) return;
     await poller.subscribeToMatch(socket, matchId, sofascoreId);
+
+    // Si el partido ya terminó, enviar resumen post-partido
+    const sfId = sofascoreId || matchId;
+    try {
+      const sofascore = require('./adapters/sofascore');
+      const today = await sofascore.getMatchesByDate(new Date().toISOString().split('T')[0]);
+      const match = today.find(m => String(m.id) === String(sfId) || String(m.id) === String(matchId));
+      if (match && match.status === 'FINISHED') {
+        const [bestPlayers, events] = await Promise.allSettled([
+          sofascore.getBestPlayers(sfId),
+          sofascore.getMatchEvents(sfId),
+        ]);
+        socket.emit('match-summary', {
+          bestPlayers: bestPlayers.value || { home: [], away: [], playerOfMatch: null },
+          events: events.value || [],
+          homeTeam: match.homeTeam,
+          awayTeam: match.awayTeam,
+          score: match.score,
+          competition: match.competition,
+          competitionId: match.competitionId,
+        });
+      }
+    } catch(e) {
+      console.error('[subscribe-match] post-match summary error:', e.message);
+    }
   });
 
   // ── El cliente cancela suscripción ──
@@ -198,6 +223,43 @@ app.get('/api/standings/:competition', async (req, res) => {
  * GET /api/health
  * Verifica que el servidor funcione
  */
+/**
+ * GET /api/match/:id/summary
+ * Resumen post-partido: mejores jugadores + eventos
+ */
+app.get('/api/match/:id/summary', async (req, res) => {
+  const sofascore = require('./adapters/sofascore');
+  const matchId = req.params.id;
+  try {
+    const [bestPlayers, events] = await Promise.allSettled([
+      sofascore.getBestPlayers(matchId),
+      sofascore.getMatchEvents(matchId),
+    ]);
+    res.json({
+      ok: true,
+      bestPlayers: bestPlayers.value || { home: [], away: [], playerOfMatch: null },
+      events: events.value || [],
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+/**
+ * GET /api/standings/:tournamentId/:seasonId
+ * Tabla de posiciones de un torneo
+ */
+app.get('/api/standings/:tournamentId/:seasonId', async (req, res) => {
+  const sofascore = require('./adapters/sofascore');
+  const { tournamentId, seasonId } = req.params;
+  try {
+    const rows = await sofascore.getStandings(tournamentId, seasonId);
+    res.json({ ok: true, standings: rows });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({
     ok: true,
