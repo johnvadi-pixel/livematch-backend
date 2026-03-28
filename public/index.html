@@ -25,7 +25,7 @@
   .disconnected { background: #3a0a0a; color: var(--red); }
   @keyframes blink { 50% { opacity: 0.4; } }
 
-  /* ââ Pantalla de bÃºsqueda ââ */
+  /* ââ Pantalla de búsqueda ââ */
   #screen-search { padding: 60px 20px; max-width: 620px; margin: 0 auto; }
   .search-title { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
   .search-sub { color: var(--muted); font-size: 15px; margin-bottom: 32px; }
@@ -250,10 +250,10 @@
   </div>
 </div>
 
-<!-- ââ Pantalla bÃºsqueda ââ -->
+<!-- ââ Pantalla búsqueda ââ -->
 <div id="screen-search">
   <div class="search-title">Partidos en vivo</div>
-  <div class="search-sub">Busca un equipo, liga o selecciÃ³n</div>
+  <div class="search-sub">Busca un equipo, liga o selección</div>
   <div class="search-box">
     <input class="search-input" id="search-input" type="text" placeholder="Real Madrid, Premier League, Colombiaâ¦" onkeydown="if(event.key==='Enter') doSearch()">
     <button class="search-btn" onclick="doSearch()">Buscar</button>
@@ -308,7 +308,7 @@
           <rect x="240" y="0" width="60" height="420" fill="rgba(0,0,0,0.04)"/>
           <rect x="360" y="0" width="60" height="420" fill="rgba(0,0,0,0.04)"/>
           <rect x="480" y="0" width="60" height="420" fill="rgba(0,0,0,0.04)"/>
-          <!-- LÃ­neas -->
+          <!-- Líneas -->
           <rect x="20" y="14" width="560" height="392" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <line x1="300" y1="14" x2="300" y2="406" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
           <circle cx="300" cy="210" r="50" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5"/>
@@ -328,7 +328,7 @@
           <!-- Jugadores (renderizados por JS) -->
           <g id="players-home"></g>
           <g id="players-away"></g>
-          <!-- BalÃ³n -->
+          <!-- Balón -->
           <text id="ball" x="300" y="213" font-size="13" text-anchor="middle" dominant-baseline="central">â½</text>
         </svg>
       </div>
@@ -354,7 +354,7 @@
       </div>
       <div class="tab-content">
         <div class="tab-pane active" id="tab-eventos"><div id="events-feed"><div class="loading">Esperando eventosâ¦</div></div></div>
-        <div class="tab-pane" id="tab-stats"><div id="stats-content"><div class="loading">Cargando estadÃ­sticasâ¦</div></div></div>
+        <div class="tab-pane" id="tab-stats"><div id="stats-content"><div class="loading">Cargando estadísticasâ¦</div></div></div>
         <div class="tab-pane" id="tab-once">
           <div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:0.5px;margin-bottom:10px" id="lineup-home-title">LOCAL</div>
           <div id="lineup-home"></div>
@@ -371,7 +371,7 @@
 <script>
 // âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // CONFIGURACIÃN
-// Cambia esta URL a la direcciÃ³n de tu backend cuando lo despliegues
+// Cambia esta URL a la dirección de tu backend cuando lo despliegues
 // âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const BACKEND_URL = 'https://livematch-backend-production.up.railway.app';
 
@@ -383,7 +383,7 @@ const state = {
   awayColor: '#a50044',
 };
 
-// ââ ConexiÃ³n Socket.io âââââââââââââââââââââââââââââââââââââââââââ
+// ââ Conexión Socket.io âââââââââââââââââââââââââââââââââââââââââââ
 const socket = io(BACKEND_URL, {
   reconnection: true,
   reconnectionDelay: 2000,
@@ -480,19 +480,19 @@ function localDate(timestamp) {
   const today = new Date();
   const tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
   if (d.toDateString() === today.toDateString()) return 'Hoy';
-  if (d.toDateString() === tomorrow.toDateString()) return 'MaÃ±ana';
+  if (d.toDateString() === tomorrow.toDateString()) return 'Mañana';
   return d.toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
-// ââ BÃºsqueda âââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ââ Búsqueda âââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // ââ Alias de selecciones nacionales y ligas ââââââââââââââââââââââ
 const SEARCH_ALIASES = {
-  'colombia': ['dimayor', 'Ã¡guilas', 'bucaramanga', 'santa fe', 'cÃºcuta', 'tolima', 'cali', 'jaguares', 'valledupar', 'chicÃ³'],
+  'colombia': ['dimayor', 'águilas', 'bucaramanga', 'santa fe', 'cúcuta', 'tolima', 'cali', 'jaguares', 'valledupar', 'chicó'],
   'argentina': ['argentina', 'afa'],
   'brasil': ['brazil', 'brasileirao', 'serie a bra'],
   'brazil': ['brazil', 'brasileirao'],
   'mexico': ['mexico', 'liga mx', 'liga de expansion'],
-  'perÃº': ['peru', 'liga 1'],
+  'perú': ['peru', 'liga 1'],
   'peru': ['peru', 'liga 1'],
   'chile': ['chile', 'primera division'],
   'ecuador': ['ecuador', 'liga pro'],
@@ -500,7 +500,7 @@ const SEARCH_ALIASES = {
   'venezuela': ['venezuela', 'liga futve'],
   'paraguay': ['paraguay', 'division profesional'],
   'bolivia': ['bolivia', 'division profesional bol'],
-  'espaÃ±a': ['laliga', 'spain', 'primera division esp'],
+  'españa': ['laliga', 'spain', 'primera division esp'],
   'spain': ['laliga', 'spain'],
   'inglaterra': ['premier league', 'england', 'championship'],
   'england': ['premier league', 'england'],
@@ -513,7 +513,7 @@ const SEARCH_ALIASES = {
   'portugal': ['liga portugal', 'portugal'],
   'usa': ['mls', 'usa', 'usl'],
   'estados unidos': ['mls', 'usa'],
-  'japÃ³n': ['j1 league', 'j league'],
+  'japón': ['j1 league', 'j league'],
   'japon': ['j1 league', 'j league'],
   'corea': ['k league', 'korea'],
 };
@@ -548,7 +548,7 @@ function doSearch() {
       if (filtered.length > 0) {
         renderResults(filtered, q);
       } else {
-        // Sin resultados hoy â buscar prÃ³ximos dÃ­as via socket
+        // Sin resultados hoy â buscar próximos días via socket
         socket.emit('search', { query: q }, (results) => {
           renderResults(results || [], q);
         });
@@ -578,7 +578,7 @@ function renderResults(matches, query) {
       return `<div class="result-card" onclick="openMatch(${JSON.stringify(m).replace(/"/g,'&quot;')})">
         <div>
           <div class="result-teams">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
-          <div class="result-meta">${m.competition} Â· <span class="status-badge badge-live"><span class="live-dot"></span>${m.minute ? m.minute+"'" : 'EN VIVO'}</span></div>
+          <div class="result-meta">${m.competition} · <span class="status-badge badge-live"><span class="live-dot"></span>${m.minute ? m.minute+"'" : 'EN VIVO'}</span></div>
         </div>
         <div class="result-score">${scoreStr}</div>
       </div>`;
@@ -592,17 +592,17 @@ function renderResults(matches, query) {
       return `<div class="result-card" onclick="openMatch(${JSON.stringify(m).replace(/"/g,'&quot;')})">
         <div>
           <div class="result-teams">${m.homeTeam.name} vs ${m.awayTeam.name}</div>
-          <div class="result-meta">${m.competition} Â· <span class="status-badge badge-fin">FIN</span></div>
+          <div class="result-meta">${m.competition} · <span class="status-badge badge-fin">FIN</span></div>
         </div>
         <div class="result-score" style="font-size:16px;color:var(--muted)">${scoreStr}</div>
       </div>`;
     }).join('');
   }
 
-  // ââ PrÃ³ximos con cuenta regresiva ââ
+  // ââ Próximos con cuenta regresiva ââ
   if (upcoming.length) {
     html += `<div class="upcoming-section">
-      <div class="upcoming-title">â° PrÃ³ximos partidos</div>`;
+      <div class="upcoming-title">â° Próximos partidos</div>`;
 
     upcoming.forEach((m, idx) => {
       const ts = m.startTimestamp || (m.utcDate ? Math.floor(new Date(m.utcDate).getTime()/1000) : null);
@@ -620,7 +620,7 @@ function renderResults(matches, query) {
         const initial = formatCountdown(ts * 1000 - Date.now());
         countdownHtml = `<div class="countdown-wrap">
           <div class="countdown ${initial.urgent ? 'urgent' : ''}" id="${cdId}">${initial.text}</div>
-          <div class="countdown-label">${dateStr} Â· ${timeStr}</div>
+          <div class="countdown-label">${dateStr} · ${timeStr}</div>
         </div>`;
       } else {
         countdownHtml = `<div class="countdown-wrap">
@@ -670,9 +670,9 @@ function renderResults(matches, query) {
     html = `<div class="no-results">No se encontraron partidos para "${query}"</div>
     <div class="no-upcoming">
       Intenta buscar directamente el nombre de la liga:<br>
-      <strong>Premier League Â· LaLiga Â· Champions Â· Serie A</strong><br><br>
-      Los partidos se muestran el mismo dÃ­a que se juegan.<br>
-      Horarios Colombia: sÃ¡bados y domingos 8amâ4pm Â· martes y miÃ©rcoles 2pmâ4pm
+      <strong>Premier League · LaLiga · Champions · Serie A</strong><br><br>
+      Los partidos se muestran el mismo día que se juegan.<br>
+      Horarios Colombia: sábados y domingos 8amâ4pm · martes y miércoles 2pmâ4pm
     </div>`;
   }
 
@@ -689,7 +689,7 @@ function openMatch(match) {
   document.getElementById('screen-match').style.display = 'block';
   document.getElementById('back-btn').style.display = 'inline-block';
 
-  // Resetear pestaÃ±a RESUMEN al abrir un partido nuevo
+  // Resetear pestaña RESUMEN al abrir un partido nuevo
   const tabBtnResumen = document.getElementById('tab-btn-resumen');
   if (tabBtnResumen) tabBtnResumen.style.display = 'none';
   const resumenContent = document.getElementById('resumen-content');
@@ -711,11 +711,11 @@ function openMatch(match) {
     sofascoreId: match.source === 'sofascore' ? match.id : null,
   });
 
-  // Si el partido terminÃ³, cargar resumen vÃ­a REST (fallback si socket no lo envÃ­a)
+  // Si el partido terminó, cargar resumen vía REST (fallback si socket no lo envía)
   if (match.status === 'FINISHED') {
     const sfId = match.id;
     setTimeout(() => {
-      // Solo cargar si aÃºn no se renderizÃ³ por socket
+      // Solo cargar si aún no se renderizó por socket
       const resumenEl = document.getElementById('resumen-content');
       if (resumenEl && resumenEl.innerHTML.trim() === '') {
         fetch(BACKEND_URL + '/api/match/' + sfId + '/summary')
@@ -790,7 +790,7 @@ function renderEvents() {
 // ââ Stats âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderStats(stats) {
   const el = document.getElementById('stats-content');
-  if (!stats.length) { el.innerHTML = '<div class="loading">Sin estadÃ­sticas aÃºn</div>'; return; }
+  if (!stats.length) { el.innerHTML = '<div class="loading">Sin estadísticas aún</div>'; return; }
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;padding:6px 0 12px;border-bottom:1px solid var(--border);margin-bottom:10px;color:var(--muted)">
       <span style="color:var(--accent)" id="sh-home-label">LOCAL</span>
@@ -822,7 +822,7 @@ function renderStats(stats) {
 function renderLineups(lineups) {
   const { home, away } = lineups;
   if (home) {
-    document.getElementById('lineup-home-title').textContent = 'LOCAL Â· ' + (home.formation || '');
+    document.getElementById('lineup-home-title').textContent = 'LOCAL · ' + (home.formation || '');
     document.getElementById('lineup-home').innerHTML = home.players
       .filter(p => !p.substitute)
       .map(p => `<div class="form-row"><span class="num">${p.number}</span><span style="flex:1">${p.name}</span><span class="pos">${p.position}</span></div>`)
@@ -830,7 +830,7 @@ function renderLineups(lineups) {
     if (home.formation) renderPlayers('players-home', home.players, state.homeColor, false);
   }
   if (away) {
-    document.getElementById('lineup-away-title').textContent = 'VISITANTE Â· ' + (away.formation || '');
+    document.getElementById('lineup-away-title').textContent = 'VISITANTE · ' + (away.formation || '');
     document.getElementById('lineup-away').innerHTML = away.players
       .filter(p => !p.substitute)
       .map(p => `<div class="form-row"><span class="num">${p.number}</span><span style="flex:1">${p.name}</span><span class="pos">${p.position}</span></div>`)
@@ -854,7 +854,7 @@ function renderPlayers(groupId, players, color, flipSide) {
       x = flipSide ? 600 - (p.coords.x / 100 * 560 + 20) : p.coords.x / 100 * 560 + 20;
       y = p.coords.y / 100 * 392 + 14;
     } else {
-      // Fallback: distribuir por posiciÃ³n
+      // Fallback: distribuir por posición
       const posMap = { GK:[0.08,0.5], DF:[0.22,0.5], MF:[0.5,0.5], FW:[0.72,0.5] };
       const base = posMap[p.position] || [0.4, 0.5];
       x = flipSide ? (1 - base[0]) * 560 + 20 : base[0] * 560 + 20;
@@ -884,7 +884,7 @@ function renderH2H(matches) {
 
 // ââ Resumen post-partido âââââââââââââââââââââââââââââââââââââââââ
 function renderMatchSummary(data) {
-  // Mostrar pestaÃ±a RESUMEN
+  // Mostrar pestaña RESUMEN
   const tabBtn = document.getElementById('tab-btn-resumen');
   if (tabBtn) { tabBtn.style.display = ''; switchTab('resumen'); }
 
@@ -1038,10 +1038,10 @@ function fireAnimation(anim) {
     'goal':        { text: 'â½ Â¡GOOOOOL!',          color: '#f0c040' },
     'own-goal':    { text: 'â½ Gol en contra',       color: '#e87040' },
     'yellow-card': { text: 'ð¨ Tarjeta amarilla',    color: '#f5c518' },
-    'red-card':    { text: 'ð¥ Â¡ExpulsiÃ³n!',         color: '#e84040' },
-    'substitution':{ text: 'ð SustituciÃ³n',         color: '#3ecf8e' },
+    'red-card':    { text: 'ð¥ Â¡Expulsión!',         color: '#e84040' },
+    'substitution':{ text: 'ð Sustitución',         color: '#3ecf8e' },
     'missed-pen':  { text: 'â Penal fallado',        color: '#7a7f96' },
-    'var':         { text: 'ðº RevisiÃ³n VAR',         color: '#7a7f96' },
+    'var':         { text: 'ðº Revisión VAR',         color: '#7a7f96' },
   };
 
   const msg = toastMessages[anim.type];
@@ -1097,7 +1097,7 @@ function showFinalScreen(match) {
     winnerEl.className = 'final-winner-label final-winner-win';
   }
 
-  // CompeticiÃ³n
+  // Competición
   const compEl = document.getElementById('final-competition');
   if (compEl) compEl.textContent = match.competition || '';
 
@@ -1139,7 +1139,7 @@ function spawnConfetti() {
   }
 }
 
-// ââ BalÃ³n âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ââ Balón âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function moveBall() {
   const ball = document.getElementById('ball');
   const x = 80 + Math.random() * 440;
@@ -1148,7 +1148,7 @@ function moveBall() {
   ball.setAttribute('y', y);
 }
 
-// Mover balÃ³n suavemente cada 8s
+// Mover balón suavemente cada 8s
 setInterval(moveBall, 8000);
 
   function crearReto() {
