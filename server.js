@@ -82,16 +82,12 @@ io.on('connection', (socket) => {
       const today = new Date().toISOString().split('T')[0];
       const todayMatches = await sofascore.getMatchesByDate(today);
       const q = query.trim().toLowerCase();
-      const const NMAP = {'argentina':['argentina'],'brasil':['brazil','brasil'],'brazil':['brazil','brasil'],'colombia':['colombia'],'mexico':['mexico'],'españa':['spain'],'spain':['spain'],'francia':['france'],'france':['france'],'alemania':['germany'],'germany':['germany'],'italia':['italy'],'italy':['italy'],'portugal':['portugal'],'inglaterra':['england'],'england':['england'],'holanda':['netherlands'],'netherlands':['netherlands'],'belgica':['belgium'],'belgium':['belgium'],'uruguay':['uruguay'],'chile':['chile'],'peru':['peru'],'ecuador':['ecuador'],'venezuela':['venezuela'],'argentina':['argentina'],'brasil':['brazil'],'usa':['united states','usa'],'estados unidos':['united states','usa'],'canada':['canada'],'marruecos':['morocco'],'morocco':['morocco'],'senegal':['senegal'],'nigeria':['nigeria'],'ghana':['ghana'],'camerun':['cameroon'],'cameroon':['cameroon'],'egipto':['egypt'],'egypt':['egypt'],'japon':['japan'],'japan':['japan'],'corea':['south korea'],'korea':['south korea'],'australia':['australia'],'iran':['iran'],'turquia':['turkey'],'turkey':['turkey'],'croacia':['croatia'],'croatia':['croatia'],'serbia':['serbia'],'dinamarca':['denmark'],'denmark':['denmark'],'suecia':['sweden'],'sweden':['sweden'],'suiza':['switzerland'],'switzerland':['switzerland'],'austria':['austria'],'polonia':['poland'],'poland':['poland'],'escocia':['scotland'],'scotland':['scotland'],'gales':['wales'],'wales':['wales'],'grecia':['greece'],'greece':['greece'],'china':['china'],'india':['india'],'qatar':['qatar'],'eliminatorias':['qualifier','world cup qualifier'],'nations league':['nations league'],'copa america':['copa america'],'eurocopa':['euro','european championship'],'mundial':['world cup'],'selecciones':['nations league','qualifier','world cup','copa america','euro']};
-      const terms = [q];
-      if (NMAP[q]) { for(var ni=0;ni<NMAP[q].length;ni++) terms.push(NMAP[q][ni]); }
-      filtered = todayMatches.filter(function(m) {
-        var home = (m.homeTeam && m.homeTeam.name || '').toLowerCase();
-        var away = (m.awayTeam && m.awayTeam.name || '').toLowerCase();
-        var comp = (m.competition || '').toLowerCase();
-        return terms.some(function(t){ return home.indexOf(t)!==-1 || away.indexOf(t)!==-1 || comp.indexOf(t)!==-1; });
-      });
-      socket.emit('search-results', filtered);
+      const filtered = todayMatches.filter(m =>
+        (function(m,q){var NM={'argentina':['argentina'],'brasil':['brazil','brasil'],'brazil':['brazil','brasil'],'colombia':['colombia'],'mexico':['mexico'],'españa':['spain'],'spain':['spain'],'francia':['france'],'france':['france'],'alemania':['germany'],'germany':['germany'],'italia':['italy'],'italy':['italy'],'portugal':['portugal'],'inglaterra':['england'],'england':['england'],'holanda':['netherlands'],'netherlands':['netherlands'],'uruguay':['uruguay'],'chile':['chile'],'peru':['peru'],'ecuador':['ecuador'],'venezuela':['venezuela'],'usa':['united states','usa'],'estados unidos':['united states','usa'],'canada':['canada'],'marruecos':['morocco'],'morocco':['morocco'],'senegal':['senegal'],'nigeria':['nigeria'],'ghana':['ghana'],'camerun':['cameroon'],'cameroon':['cameroon'],'egipto':['egypt'],'egypt':['egypt'],'japon':['japan'],'japan':['japan'],'corea':['south korea'],'korea':['south korea'],'australia':['australia'],'iran':['iran'],'turquia':['turkey'],'turkey':['turkey'],'croacia':['croatia'],'croatia':['croatia'],'serbia':['serbia'],'eliminatorias':['qualifier','world cup qualifier'],'nations league':['nations league'],'copa america':['copa america'],'eurocopa':['euro','european championship'],'mundial':['world cup'],'selecciones':['nations league','qualifier','world cup','copa america','euro']};var ts=[q];if(NM[q])NM[q].forEach(function(t){ts.push(t);});return ts.some(function(t){return(m.homeTeam?.name||'').toLowerCase().includes(t)||(m.awayTeam?.name||'').toLowerCase().includes(t)||(m.competition||'').toLowerCase().includes(t);});}(m,q))
+      );
+      if (filtered.length > 0) {
+        callback?.(filtered);
+        socket.emit('search-results', filtered);
         return;
       }
       // Si no hay resultados hoy, buscar en prÃÂÃÂ³ximos dÃÂÃÂ­as
