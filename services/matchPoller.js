@@ -3,7 +3,7 @@
  *
  * Orquesta el polling de datos en tiempo real.
  * - Cada 30s consulta football-data.org (marcadores + eventos oficiales)
- * - Cada 15s consulta SofaScore (incidencias más rápidas)
+ * - Cada 15s consulta SofaScore (incidencias mÃ¡s rÃ¡pidas)
  * - Detecta cambios y emite solo lo nuevo por WebSocket
  * - Mantiene un estado en memoria de todos los partidos activos
  */
@@ -12,7 +12,7 @@ const footballData = require('../adapters/footballData');
 const sofascore    = require('../adapters/sofascore');
 const NodeCache    = require('node-cache');
 
-// Cache con TTL de 2 minutos para no re-procesar datos idénticos
+// Cache con TTL de 2 minutos para no re-procesar datos idÃ©nticos
 const cache = new NodeCache({ stdTTL: 120 });
 
 // Estado global en memoria: { [matchId]: matchState }
@@ -27,7 +27,7 @@ let sofaTimer  = null;
 
 const DEBUG = process.env.DEBUG === 'true';
 
-// ── Inicialización ────────────────────────────────────────────────
+// ââ InicializaciÃ³n ââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function init(socketIoServer) {
   io = socketIoServer;
@@ -37,7 +37,7 @@ function init(socketIoServer) {
   pollFootballData();
   pollSofaScore();
 
-  // Polling periódico
+  // Polling periÃ³dico
   const fdInterval   = parseInt(process.env.POLL_INTERVAL_MS)      || 30000;
   const sfInterval   = parseInt(process.env.SOFASCORE_INTERVAL_MS) || 15000;
 
@@ -52,12 +52,12 @@ function stop() {
   clearInterval(sofaTimer);
 }
 
-// ── Polling football-data.org ─────────────────────────────────────
+// ââ Polling football-data.org âââââââââââââââââââââââââââââââââââââ
 
 async function pollFootballData() {
   const apiKey = process.env.FOOTBALL_DATA_API_KEY;
   if (!apiKey || apiKey === 'tu_clave_aqui') {
-    log('⚠ FOOTBALL_DATA_API_KEY no configurada. Usando solo SofaScore.');
+    log('â  FOOTBALL_DATA_API_KEY no configurada. Usando solo SofaScore.');
     return;
   }
 
@@ -77,7 +77,7 @@ async function pollFootballData() {
   }
 }
 
-// ── Polling SofaScore ─────────────────────────────────────────────
+// ââ Polling SofaScore âââââââââââââââââââââââââââââââââââââââââââââ
 
 async function pollSofaScore() {
   try {
@@ -103,13 +103,14 @@ async function pollSofaScore() {
         log(`Nuevas incidencias en partido ${matchId}: ${newIncidents.length}`);
         for (const inc of newIncidents) {
           emitToMatch(matchId, 'incident', inc);
+          if (global._procesarIncidente) global._procesarIncidente({ matchId, player: inc.player, incidentType: inc.incidentType, time: inc.time, isLive: true });
           emitToMatch(matchId, 'animation', buildAnimation(inc));
         }
         // Actualizar estado de incidencias
         matchStates.get(matchId).incidents = incidents;
       }
 
-      // Actualizar marcador si cambió
+      // Actualizar marcador si cambiÃ³
       const prev = matchStates.get(matchId);
       if (
         prev.score.home !== sfMatch.score.home ||
@@ -131,14 +132,14 @@ async function pollSofaScore() {
   }
 }
 
-// ── Procesamiento de actualizaciones ─────────────────────────────
+// ââ Procesamiento de actualizaciones âââââââââââââââââââââââââââââ
 
 async function processMatchUpdate(match, source) {
   const id = String(match.id);
   const prev = matchStates.get(id);
 
   if (!prev) {
-    // Partido nuevo — guardar estado inicial
+    // Partido nuevo â guardar estado inicial
     matchStates.set(id, {
       ...match,
       source,
@@ -171,12 +172,12 @@ async function processMatchUpdate(match, source) {
   prev.lastUpdated = Date.now();
 }
 
-// ── Suscripciones de sockets ──────────────────────────────────────
+// ââ Suscripciones de sockets ââââââââââââââââââââââââââââââââââââââ
 
 /**
  * Cuando un cliente se suscribe a un partido:
  * 1. Lo agrega a subscribers
- * 2. Le envía el estado actual completo
+ * 2. Le envÃ­a el estado actual completo
  * 3. Si no tenemos datos en vivo, los fetcha inmediatamente
  */
 async function subscribeToMatch(socket, matchId, sofascoreId) {
@@ -199,7 +200,7 @@ async function subscribeToMatch(socket, matchId, sofascoreId) {
     socket.emit('match-state', state);
   }
 
-  // Fetch enriquecido de SofaScore (alineaciones, estadísticas, H2H)
+  // Fetch enriquecido de SofaScore (alineaciones, estadÃ­sticas, H2H)
   if (sofascoreId) {
     await fetchMatchEnrichment(socket, id, sofascoreId);
   }
@@ -243,7 +244,7 @@ async function fetchMatchEnrichment(socket, matchId, sofascoreId) {
   }
 }
 
-// ── Detección de nuevas incidencias ──────────────────────────────
+// ââ DetecciÃ³n de nuevas incidencias ââââââââââââââââââââââââââââââ
 
 function detectNewIncidents(matchId, currentIncidents) {
   const state = matchStates.get(matchId);
@@ -253,7 +254,7 @@ function detectNewIncidents(matchId, currentIncidents) {
   return currentIncidents.filter(i => !knownIds.has(i.id));
 }
 
-// ── Constructor de animaciones ────────────────────────────────────
+// ââ Constructor de animaciones ââââââââââââââââââââââââââââââââââââ
 
 function buildAnimation(incident) {
   const animMap = {
@@ -275,7 +276,7 @@ function buildAnimation(incident) {
   };
 }
 
-// ── Búsqueda de partidos ──────────────────────────────────────────
+// ââ BÃºsqueda de partidos ââââââââââââââââââââââââââââââââââââââââââ
 
 async function searchMatches(query) {
   const cacheKey = `search:${query.toLowerCase().trim()}`;
@@ -287,7 +288,7 @@ async function searchMatches(query) {
     const hasKey = apiKey && apiKey !== 'tu_clave_aqui';
     const today  = new Date().toISOString().split('T')[0];
 
-    // Busca hoy + próximos 7 días en football-data si hay clave
+    // Busca hoy + prÃ³ximos 7 dÃ­as en football-data si hay clave
     const nextDates = hasKey ? Array.from({length: 7}, (_, i) => {
       const d = new Date(); d.setDate(d.getDate() + i + 1);
       return d.toISOString().split('T')[0];
@@ -312,11 +313,11 @@ async function searchMatches(query) {
       ...nextFD.flatMap(r => r.value || []),
     ].filter(filterFn);
 
-    // Combinar: SofaScore primero (más datos), luego football-data
+    // Combinar: SofaScore primero (mÃ¡s datos), luego football-data
     const sfList = (sfResults.value || []).filter(Boolean);
     const combined = [...sfList, ...fdAll];
 
-    // Separar por estado para ordenar: en vivo > terminados > próximos
+    // Separar por estado para ordenar: en vivo > terminados > prÃ³ximos
     const statusOrder = { IN_PLAY: 0, PAUSED: 0, FINISHED: 1, SCHEDULED: 2, TIMED: 2 };
     combined.sort((a, b) => (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3));
 
@@ -337,7 +338,7 @@ async function searchMatches(query) {
   }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────
+// ââ Helpers âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function emitToMatch(matchId, event, data) {
   if (io) io.to(`match:${matchId}`).emit(event, data);
