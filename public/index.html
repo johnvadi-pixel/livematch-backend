@@ -128,6 +128,30 @@
     .main { grid-template-columns: 1fr; }
     .right-panel { height: 300px; }
   }
+
+  /* ── Resumen post-partido ── */
+  .summary-section { margin-bottom: 18px; }
+  .summary-title { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); text-transform: uppercase; }
+  .pom-card { background: linear-gradient(135deg, rgba(79,140,247,0.15), rgba(62,207,142,0.1)); border: 1px solid rgba(79,140,247,0.3); border-radius: 10px; padding: 14px; text-align: center; margin-bottom: 14px; }
+  .pom-label { font-size: 10px; color: var(--muted); font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
+  .pom-name { font-size: 17px; font-weight: 800; color: var(--text); }
+  .pom-rating { font-size: 22px; font-weight: 900; color: #3ecf8e; margin-top: 2px; }
+  .players-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 4px; }
+  .players-col-title { font-size: 10px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+  .player-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: rgba(255,255,255,0.03); border-radius: 6px; margin-bottom: 4px; }
+  .player-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .player-rating { font-size: 13px; font-weight: 800; color: #3ecf8e; }
+  .player-stats { font-size: 10px; color: var(--muted); }
+  .event-feed-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .event-min-sm { font-size: 11px; font-weight: 700; color: var(--muted); min-width: 30px; }
+  .standings-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .standings-table th { color: var(--muted); font-weight: 600; text-align: center; padding: 4px 2px; border-bottom: 1px solid var(--border); }
+  .standings-table th:first-child { text-align: left; }
+  .standings-table td { padding: 5px 2px; text-align: center; color: var(--text); border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .standings-table td:first-child { text-align: left; }
+  .standings-table td:nth-child(2) { text-align: left; font-weight: 600; }
+  .standings-table tr.highlight td { background: rgba(79,140,247,0.12); font-weight: 700; }
+  .pts-cell { font-weight: 800; color: var(--accent); }
 </style>
 </head>
 <body>
@@ -216,6 +240,7 @@
         <div class="tab" onclick="switchTab('stats')">STATS</div>
         <div class="tab" onclick="switchTab('once')">ONCE</div>
         <div class="tab" onclick="switchTab('h2h')">H2H</div>
+        <div class="tab" id="tab-btn-resumen" onclick="switchTab('resumen')" style="display:none">📊 RESUMEN</div>
       </div>
       <div class="tab-content">
         <div class="tab-pane active" id="tab-eventos"><div id="events-feed"><div class="loading">Esperando eventos…</div></div></div>
@@ -227,6 +252,7 @@
           <div id="lineup-away"></div>
         </div>
         <div class="tab-pane" id="tab-h2h"><div id="h2h-content"><div class="loading">Cargando historial…</div></div></div>
+        <div class="tab-pane" id="tab-resumen"><div id="resumen-content"></div></div>
       </div>
     </div>
   </div>
@@ -305,6 +331,10 @@ socket.on('match-enrichment', (data) => {
   if (data.lineups) renderLineups(data.lineups);
   if (data.stats)   renderStats(data.stats);
   if (data.h2h)     renderH2H(data.h2h);
+});
+
+socket.on('match-summary', (data) => {
+  renderMatchSummary(data);
 });
 
 // ── Contadores regresivos activos ────────────────────────────────
@@ -545,6 +575,12 @@ function openMatch(match) {
   document.getElementById('screen-match').style.display = 'block';
   document.getElementById('back-btn').style.display = 'inline-block';
 
+  // Resetear pestaña RESUMEN al abrir un partido nuevo
+  const tabBtnResumen = document.getElementById('tab-btn-resumen');
+  if (tabBtnResumen) tabBtnResumen.style.display = 'none';
+  const resumenContent = document.getElementById('resumen-content');
+  if (resumenContent) resumenContent.innerHTML = '';
+
   // Actualizar scoreboard con datos disponibles
   updateScoreboard(match);
 
@@ -699,6 +735,116 @@ function renderH2H(matches) {
       </div>`).join('');
 }
 
+// ── Resumen post-partido ─────────────────────────────────────────
+function renderMatchSummary(data) {
+  // Mostrar pestaña RESUMEN
+  const tabBtn = document.getElementById('tab-btn-resumen');
+  if (tabBtn) { tabBtn.style.display = ''; switchTab('resumen'); }
+
+  const el = document.getElementById('resumen-content');
+  if (!el) return;
+
+  let html = '';
+
+  // ── Jugador del partido ──
+  const pom = data.bestPlayers?.playerOfMatch;
+  if (pom && pom.name) {
+    html += `<div class="summary-section pom-card">
+      <div class="pom-label">⭐ JUGADOR DEL PARTIDO</div>
+      <div class="pom-name">${pom.name}</div>
+      ${pom.rating ? `<div class="pom-rating">${pom.rating}</div>` : ''}
+    </div>`;
+  }
+
+  // ── Mejores jugadores por equipo ──
+  const homePlayers = data.bestPlayers?.home || [];
+  const awayPlayers = data.bestPlayers?.away || [];
+  if (homePlayers.length || awayPlayers.length) {
+    const renderPlayerRow = (p) => `
+      <div class="player-row">
+        <div>
+          <div class="player-name">${p.name}</div>
+          <div class="player-stats">${p.goals ? '⚽ ' + p.goals : ''}${p.assists ? ' 🎯 ' + p.assists : ''} ${p.position || ''}</div>
+        </div>
+        ${p.rating ? `<div class="player-rating">${p.rating}</div>` : ''}
+      </div>`;
+
+    html += `<div class="summary-section">
+      <div class="summary-title">🏆 MEJORES JUGADORES</div>
+      <div class="players-grid">
+        <div>
+          <div class="players-col-title" style="color:var(--accent)">${data.homeTeam?.name || 'LOCAL'}</div>
+          ${homePlayers.map(renderPlayerRow).join('')}
+        </div>
+        <div>
+          <div class="players-col-title" style="color:var(--red)">${data.awayTeam?.name || 'VISITANTE'}</div>
+          ${awayPlayers.map(renderPlayerRow).join('')}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ── Eventos del partido (goles y tarjetas) ──
+  const events = (data.events || []).filter(e => ['gol','gol-en-contra','tarjeta-roja','tarjeta-amarilla'].includes(e.type));
+  if (events.length) {
+    const iconMap = { 'gol': '⚽', 'gol-en-contra': '⚽🔴', 'tarjeta-amarilla': '🟨', 'tarjeta-roja': '🟥' };
+    html += `<div class="summary-section">
+      <div class="summary-title">📋 RESUMEN DEL PARTIDO</div>
+      ${events.map(e => `
+        <div class="event-feed-item">
+          <span class="event-min-sm">${e.minute}'${e.minuteExtra ? '+'+e.minuteExtra : ''}</span>
+          <span>${iconMap[e.type] || '•'}</span>
+          <span style="flex:1;font-weight:600">${e.player}</span>
+          <span style="font-size:11px;color:var(--muted)">${e.team === 'home' ? (data.homeTeam?.name || 'Local') : (data.awayTeam?.name || 'Visitante')}</span>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  el.innerHTML = html || '<div class="loading">No hay datos de resumen disponibles</div>';
+
+  // Cargar tabla de posiciones aparte si hay competitionId
+  if (data.competitionId) {
+    loadStandings(data.competitionId, data.homeTeam, data.awayTeam, el);
+  }
+}
+
+async function loadStandings(competitionId, homeTeam, awayTeam, containerEl) {
+  try {
+    const resp = await fetch(BACKEND_URL + '/api/standings/' + competitionId + '/current');
+    const json = await resp.json();
+    if (!json.ok || !json.standings?.length) return;
+
+    const rows = json.standings;
+    const homeId = homeTeam?.id;
+    const awayId = awayTeam?.id;
+
+    const tableHtml = `<div class="summary-section" style="margin-top:16px">
+      <div class="summary-title">📊 TABLA DE POSICIONES</div>
+      <table class="standings-table">
+        <thead><tr>
+          <th>#</th><th style="text-align:left">Equipo</th>
+          <th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GA</th><th>Pts</th>
+        </tr></thead>
+        <tbody>
+          ${rows.slice(0, 12).map(r => `<tr class="${(r.teamId === homeId || r.teamId === awayId) ? 'highlight' : ''}">
+            <td>${r.position}</td>
+            <td>${r.team}</td>
+            <td>${r.played}</td>
+            <td>${r.wins}</td>
+            <td>${r.draws}</td>
+            <td>${r.losses}</td>
+            <td>${r.goalsFor}</td>
+            <td>${r.goalsAgainst}</td>
+            <td class="pts-cell">${r.points}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+
+    containerEl.insertAdjacentHTML('beforeend', tableHtml);
+  } catch(e) { /* silently fail */ }
+}
+
 // ── Animaciones ───────────────────────────────────────────────────
 function fireAnimation(anim) {
   const overlay = document.getElementById('anim-overlay');
@@ -742,7 +888,7 @@ function fireAnimation(anim) {
 
 // ── Tabs ──────────────────────────────────────────────────────────
 function switchTab(name) {
-  const names = ['eventos','stats','once','h2h'];
+  const names = ['eventos','stats','once','h2h','resumen'];
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', names[i] === name));
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
 }
