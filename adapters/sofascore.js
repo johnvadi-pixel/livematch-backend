@@ -251,6 +251,97 @@ function handleError(fn, err) {
   }
 }
 
+/**
+ * Mejores jugadores del partido (post-partido)
+ */
+async function getBestPlayers(eventId) {
+  try {
+    const { data } = await client.get(`/event/${eventId}/best-players`);
+    const home = (data.homeTeam?.players || []).slice(0, 3).map(p => ({
+      name: p.player?.shortName || p.player?.name || '',
+      rating: p.statistics?.rating?.toFixed(1) || null,
+      goals: p.statistics?.goals || 0,
+      assists: p.statistics?.goalAssist || 0,
+      position: p.player?.position || '',
+      teamSide: 'home',
+    }));
+    const away = (data.awayTeam?.players || []).slice(0, 3).map(p => ({
+      name: p.player?.shortName || p.player?.name || '',
+      rating: p.statistics?.rating?.toFixed(1) || null,
+      goals: p.statistics?.goals || 0,
+      assists: p.statistics?.goalAssist || 0,
+      position: p.player?.position || '',
+      teamSide: 'away',
+    }));
+    const playerOfMatch = data.playerOfMatch ? {
+      name: data.playerOfMatch?.player?.shortName || data.playerOfMatch?.player?.name || '',
+      rating: data.playerOfMatch?.statistics?.rating?.toFixed(1) || null,
+      teamSide: data.playerOfMatch?.isHomeTeam ? 'home' : 'away',
+    } : null;
+    return { home, away, playerOfMatch };
+  } catch (err) {
+    handleError('getBestPlayers', err);
+    return { home: [], away: [], playerOfMatch: null };
+  }
+}
+
+/**
+ * Tabla de posiciones del torneo
+ */
+async function getStandings(tournamentId, seasonId) {
+  try {
+    const { data } = await client.get(`/unique-tournament/${tournamentId}/season/${seasonId}/standings/total`);
+    const rows = data.standings?.[0]?.rows || [];
+    return rows.map(r => ({
+      position: r.position,
+      team: r.team?.shortName || r.team?.name || '',
+      teamId: r.team?.id,
+      played: r.matches,
+      wins: r.wins,
+      draws: r.draws,
+      losses: r.losses,
+      goalsFor: r.scoresFor,
+      goalsAgainst: r.scoresAgainst,
+      points: r.points,
+      form: r.promotion?.text || null,
+    }));
+  } catch (err) {
+    handleError('getStandings', err);
+    return [];
+  }
+}
+
+/**
+ * Eventos/goles del partido (resumen post-partido)
+ */
+async function getMatchEvents(eventId) {
+  try {
+    const { data } = await client.get(`/event/${eventId}/incidents`);
+    const incidents = data.incidents || [];
+    // Filtrar solo goles, tarjetas y sustituciones
+    const typeMap = {
+      goal: 'gol', ownGoal: 'gol-en-contra',
+      yellowCard: 'tarjeta-amarilla', redCard: 'tarjeta-roja',
+      yellowRedCard: 'tarjeta-roja', substitution: 'cambio',
+      varDecision: 'var', missedPenalty: 'penal-fallado',
+    };
+    return incidents
+      .filter(inc => typeMap[inc.incidentType])
+      .map(inc => ({
+        type: typeMap[inc.incidentType] || inc.incidentType,
+        minute: inc.time,
+        minuteExtra: inc.addedTime || null,
+        team: inc.isHome ? 'home' : 'away',
+        player: inc.player?.shortName || inc.player?.name || '',
+        assist: inc.playerIn?.shortName || inc.assist?.name || null,
+        description: inc.description || '',
+      }));
+  } catch (err) {
+    handleError('getMatchEvents', err);
+    return [];
+  }
+}
+
 module.exports = {
   getLiveMatches,
   getMatchesByDate,
@@ -259,4 +350,7 @@ module.exports = {
   getMatchLineups,
   getH2H,
   search,
+  getBestPlayers,
+  getStandings,
+  getMatchEvents,
 };
