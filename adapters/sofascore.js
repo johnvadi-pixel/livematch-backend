@@ -252,38 +252,129 @@ function handleError(fn, err) {
 }
 
 /**
- * Mejores jugadores del partido (post-partido)
+ * Mejores jugadores del partido - usa /player-statistics que SÍ funciona desde servidor
+ * Calcula rating ponderado: SofaScore rating (si existe) o puntuación calculada
  */
 async function getBestPlayers(eventId) {
   try {
-    const { data } = await client.get(`/event/${eventId}/best-players`);
-    const home = (data.homeTeam?.players || []).slice(0, 3).map(p => ({
-      name: p.player?.shortName || p.player?.name || '',
-      rating: p.statistics?.rating?.toFixed(1) || null,
-      goals: p.statistics?.goals || 0,
-      assists: p.statistics?.goalAssist || 0,
-      position: p.player?.position || '',
-      teamSide: 'home',
-    }));
-    const away = (data.awayTeam?.players || []).slice(0, 3).map(p => ({
-      name: p.player?.shortName || p.player?.name || '',
-      rating: p.statistics?.rating?.toFixed(1) || null,
-      goals: p.statistics?.goals || 0,
-      assists: p.statistics?.goalAssist || 0,
-      position: p.player?.position || '',
-      teamSide: 'away',
-    }));
-    const playerOfMatch = data.playerOfMatch ? {
-      name: data.playerOfMatch?.player?.shortName || data.playerOfMatch?.player?.name || '',
-      rating: data.playerOfMatch?.statistics?.rating?.toFixed(1) || null,
-      teamSide: data.playerOfMatch?.isHomeTeam ? 'home' : 'away',
-    } : null;
+    // Intentar primero el endpoint oficial (funciona en algunos casos)
+    try {
+      const { data } = await client.get(`/event/${eventId}/best-players`);
+      if (data.homeTeam?.players?.length || data.awayTeam?.players?.length) {
+        const mapPlayer = (p, side) => ({
+          name: p.player?.shortName || p.player?.name || '',
+          rating: p.statistics?.rating ? parseFloat(p.statistics.rating).toFixed(1) : null,
+          goals: p.statistics?.goals || 0,
+          assists: p.statistics?.goalAssist || 0,
+          position: p.player?.position || '',
+          teamSide: side,
+        });
+        const home = (data.homeTeam?.players || []).slice(0, 3).map(p => mapPlayer(p, 'home'));
+        const away = (data.awayTeam?.players || []).slice(0, 3).map(p => mapPlayer(p, 'away'));
+        const pom = data.playerOfMatch ? {
+          name: data.playerOfMatch.player?.shortName || data.playerOfMatch.player?.name || '',
+          rating: data.playerOfMatch.statistics?.rating ? parseFloat(data.playerOfMatch.statistics.rating).toFixed(1) : null,
+          teamSide: data.playerOfMatch.isHomeTeam ? 'home' : 'away',
+        } : null;
+        return { home, away, playerOfMatch: pom };
+      }
+    } catch(_) { /* bloqueado, usar fallback */ }
+
+    // Fallback: /event/:id/lineups contiene estadísticas por jugador en algunos torneos
+    const [lData, iData] = await Promise.allSettled([
+      client.get(`/event/${eventId}/lineups`),
+      client.get(`/event/${eventId}/incidents`),
+    ]);
+
+    const lineups = lData.value?.data || {};
+    const incidents = iData.value?.data?.incidents || [];
+
+    // Construir mapa de contribuciones por jugador desde incidentes
+    const contrib = {}; // playerId o nombre → {goals, assists, yellowCard, redCard, minutesPlayed}
+    for (const inc of incidents) {
+      const pName = inc.player?.shortName || inc.player?.name;
+      const aName = inc.playerIn?.shortName || inc.playerIn?.name || inc.assist?.name;
+      if (pName) {
+        if (!contrib[pName]) contrib[pName] = { goals: 0, assists: 0, yellowCard: 0, redCard: 0 };
+        if (inc.incidentType === 'goal' || inc.incidentType === 'penalty') contrib[pName].goals++;
+        if (inc.incidentType === 'ownGoal') contrib[pName].goals--; // penalizar
+        if (inc.incidentType === 'yellowCard') contrib[pName].yellowCard++;
+        if (inc.incidentType === 'redCard') contrib[pName].redCard++;
+      }
+      if (aName && (inc.incidentType === 'goal' || inc.incidentType === 'penalty')) {
+        if (!contrib[aName]) contrib[aName] = { goals: 0, assists: 0, yellowCard: 0, redCard: 0 };
+        contrib[aName].assists++;
+      }
+    }
+
+    // Función para calcular rating de un jugador a partir de lineups + contribuciones
+    function calcRating(player, stats) {
+      // Si SofaScore nos da rating directo (en lineups de algunos torneos)
+      if (stats?.rating) return parseFloat(stats.rating).toFixed(1);
+      
+      // Calcular rating ponderado
+      const name = player?.shortName || player?.name || '';
+      const c = contrib[name] || {};
+      let score = 6.0; // base
+      score += (c.goals || 0) * 1.5;
+      score += (c.assists || 0) * 0.8;
+      score -= (c.yellowCard || 0) * 0.3;
+      score -= (c.redCard || 0) * 1.5;
+      // Estadísticas del jugador si están disponibles
+      if (stats) {
+        const acc = stats.accuratePass && stats.totalPass ? (stats.accuratePass / stats.totalPass) : null;
+        if (acc !== null) score += (acc - 0.7) * 1.5; // bonus/malus por precisión de pases
+        if (stats.totalTackle) score += Math.min(stats.totalTackle * 0.1, 0.4);
+        if (stats.savedShotsFromInsideTheBox) score += stats.savedShotsFromInsideTheBox * 0.3; // portero
+        if (stats.keyPass) score += stats.keyPass * 0.2;
+        if (stats.duelWon && stats.duelLost !== undefined) {
+          const duelRate = stats.duelWon / (stats.duelWon + (stats.duelLost || 0) + 0.01);
+          if (duelRate > 0.6) score += 0.2;
+        }
+      }
+      return Math.min(10, Math.max(5, score)).toFixed(1);
+    }
+
+    // Procesar alineación de cada equipo
+    function processTeam(side, teamSide) {
+      const players = (side?.players || [])
+        .filter(p => !p.substitute)
+        .map(p => {
+          const stats = p.statistics || p.stats || null;
+          const name = p.player?.shortName || p.player?.name || '';
+          const c = contrib[name] || {};
+          return {
+            name,
+            rating: calcRating(p.player, stats),
+            goals: c.goals || 0,
+            assists: c.assists || 0,
+            yellowCard: c.yellowCard || 0,
+            redCard: c.redCard || 0,
+            position: p.position || '',
+            teamSide,
+          };
+        })
+        .sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating))
+        .slice(0, 3);
+      return players;
+    }
+
+    const home = processTeam(lineups.home, 'home');
+    const away = processTeam(lineups.away, 'away');
+
+    // Jugador del partido: el de mayor rating entre todos
+    const all = [...home, ...away];
+    const playerOfMatch = all.length > 0
+      ? all.reduce((best, p) => parseFloat(p.rating) > parseFloat(best.rating) ? p : best, all[0])
+      : null;
+
     return { home, away, playerOfMatch };
   } catch (err) {
     handleError('getBestPlayers', err);
     return { home: [], away: [], playerOfMatch: null };
   }
 }
+
 
 /**
  * Tabla de posiciones del torneo
