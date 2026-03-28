@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SportReto</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+<style>
+:root{--bg:#0d0d14;--s:#14141e;--s2:#1c1c2a;--b:rgba(255,255,255,0.08);--b2:rgba(255,255,255,0.16);--g:#00e5a0;--r:#ff4d6d;--a:#ffd166;--t:#eeeef5;--m:#6b6b85;--m2:#9898b0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:24px 16px 60px}
+.logo{font-size:26px;font-weight:800;color:var(--g);margin-bottom:4px}.logo span{color:var(--t)}
+.sub{font-size:12px;color:var(--m2);margin-bottom:28px}
+.screen{display:none}.screen.active{display:block}
+.lbl{font-size:10px;letter-spacing:2px;color:var(--g);margin-bottom:10px;text-transform:uppercase;font-weight:600}
+.card{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:16px 20px;margin-bottom:20px}
+.player-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--s);border:1px solid var(--b);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.player-row:hover{border-color:var(--b2)}.player-row.sel{border-color:var(--g);background:rgba(0,229,160,.07)}
+.player-row.taken{opacity:.3;pointer-events:none}
+.pos{font-size:10px;color:var(--m);background:var(--s2);border:1px solid var(--b);padding:2px 6px;border-radius:3px;margin-right:10px}
+.rat{font-size:11px;color:var(--m2)}.rat.hi{color:var(--g)}
+.sbadge{font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(0,229,160,.15);color:var(--g)}
+.ni{width:100%;padding:10px 14px;background:var(--s);border:1px solid var(--b2);border-radius:8px;color:var(--t);font-size:14px;margin-bottom:16px;outline:none}
+.ni:focus{border-color:var(--g)}
+.btn{width:100%;padding:14px;background:var(--g);color:#0d0d14;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:opacity .15s;margin-bottom:8px}
+.btn:disabled{opacity:.3;cursor:not-allowed}.btn:hover:not(:disabled){opacity:.88}
+.btn2{width:100%;padding:12px;background:transparent;color:var(--t);border:1px solid var(--b2);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn2:hover{border-color:var(--g);color:var(--g)}
+.sboard{background:var(--s);border:1px solid var(--b);border-radius:12px;padding:24px;text-align:center;margin-bottom:16px}
+.srow{display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:12px}
+.sname{font-size:11px;color:var(--m2);margin-bottom:4px;letter-spacing:1px}
+.spts{font-size:52px;font-weight:800;line-height:1;transition:all .3s}
+.spts.me{color:var(--g)}.spts.fr{color:var(--r)}
+.lbar{height:3px;background:var(--s2);border-radius:2px;overflow:hidden}
+.lfill{height:100%;background:var(--g);border-radius:2px;width:50%;transition:width .5s}
+.minu{font-size:11px;color:var(--a);margin-top:10px}
+.ev{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;background:var(--s);border:1px solid var(--b);border-radius:8px;margin-bottom:8px;animation:si .3s ease forwards;opacity:0}
+@keyframes si{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.emin{font-size:10px;color:var(--m);min-width:34px;margin-top:2px}
+.eact{font-size:13px;font-weight:600;margin-bottom:2px}.epla{font-size:11px;color:var(--m2)}
+.epts{font-size:13px;font-weight:700;min-width:50px;text-align:right}
+.epts.p{color:var(--g)}.epts.n{color:var(--r)}
+.ev.gol{border-color:rgba(0,229,160,.25)}.ev.roja{border-color:rgba(255,77,109,.25)}
+#sr{text-align:center;padding:40px 0 20px}
+.rt{font-size:50px;font-weight:900;letter-spacing:2px;margin-bottom:6px}
+.rt.w{color:var(--g)}.rt.l{color:var(--r)}.rt.d{color:var(--a)}
+.rdiff{font-size:14px;color:var(--m2);margin-bottom:28px}
+.bd{background:var(--s);border:1px solid var(--b);border-radius:10px;overflow:hidden;margin-bottom:20px;text-align:left}
+.bdr{display:grid;grid-template-columns:1fr auto 1fr;padding:11px 16px;border-bottom:1px solid var(--b);gap:8px;align-items:center}
+.bdr:last-child{border-bottom:none}.bdrh{background:var(--s2)}
+.bdn{font-size:13px;font-weight:500}
+.bdm{font-size:10px;color:var(--m);text-align:center}
+.bdpm{font-size:13px;color:var(--g);font-weight:600;text-align:right}
+.bdpf{font-size:13px;color:var(--r);font-weight:600}
+</style>
+</head>
+<body>
+<div class="logo">Sport<span>Reto</span></div>
+<div class="sub" id="mlabel">Cargando...</div>
+
+<div class="screen active" id="sl"><p style="color:var(--m2);padding-top:60px;text-align:center">Cargando reto...</p></div>
+
+<div class="screen" id="sa">
+  <div class="lbl">Tu rival eligió</div>
+  <div class="card"><div style="font-size:15px;font-weight:600;margin-bottom:8px" id="rname">—</div><div id="rpills" style="display:flex;gap:8px;flex-wrap:wrap"></div></div>
+  <div class="lbl">Tu nombre</div>
+  <input class="ni" id="myname" placeholder="¿Cómo te llamas?" maxlength="20">
+  <div class="lbl">Elige tus 3 jugadores</div>
+  <div id="pool"></div>
+  <button class="btn" id="btnA" disabled onclick="aceptar()">ACEPTAR EL RETO</button>
+</div>
+
+<div class="screen" id="slive">
+  <div class="sboard">
+    <div class="srow">
+      <div><div class="sname" id="lnme">TÚ</div><div class="spts me" id="lme">0</div></div>
+      <div style="font-size:20px;color:var(--m)">—</div>
+      <div><div class="sname" id="lnfr">RIVAL</div><div class="spts fr" id="lfr">0</div></div>
+    </div>
+    <div class="lbar"><div class="lfill" id="lf"></div></div>
+    <div class="minu" id="lmin">En vivo</div>
+  </div>
+  <div class="lbl">Eventos</div>
+  <div id="elog"></div>
+</div>
+
+<div class="screen" id="sr">
+  <div class="lbl">RESULTADO FINAL</div>
+  <div class="rt" id="rtit">—</div>
+  <div class="rdiff" id="rdiff"></div>
+  <div class="lbl">Desglose</div>
+  <div class="bd" id="rbd"></div>
+  <button class="btn2" onclick="compartir()">Compartir por WhatsApp</button>
+</div>
+
+<script>
+const BASE=window.location.origin;
+const RID=window.location.pathname.split('/').pop();
+const socket=io(BASE);
+let reto=null,myToken=localStorage.getItem('rt_'+RID),myLado=null,mySel=[];
+const PLAYERS=[
+  {id:'277722',name:'Mbappé',pos:'DC',r:8.6},{id:'191517',name:'Vinicius Jr.',pos:'EX',r:8.4},
+  {id:'209331',name:'Bellingham',pos:'MC',r:8.2},{id:'5619',name:'Kroos',pos:'MC',r:7.8},
+  {id:'796749',name:'Griezmann',pos:'DC',r:8.1},{id:'151562',name:'Morata',pos:'DC',r:7.6},
+  {id:'330173',name:'Oblak',pos:'PO',r:8.0},{id:'183588',name:'Koke',pos:'MC',r:7.4}
+];
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function pname(id){return(PLAYERS.find(p=>p.id===id)||{name:id}).name;}
+function ftype(t){return{goal:'Gol',assist:'Asistencia',yellowCard:'Tarjeta amarilla',redCard:'Tarjeta roja',savedShot:'Parada clave',penaltyMiss:'Fallo penalti'}[t]||t;}
+
+async function init(){
+  const res=await fetch(BASE+'/reto/'+RID+'/data');
+  if(!res.ok){show('sl');document.getElementById('sl').innerHTML='<p style="color:var(--r);text-align:center;padding-top:60px">Reto no encontrado</p>';return;}
+  reto=await res.json();
+  document.getElementById('mlabel').textContent=reto.match_label||'Partido';
+  if(myToken&&reto.player_a&&reto.player_a.user_token===myToken)myLado='a';
+  else if(myToken&&reto.player_b&&reto.player_b.user_token===myToken)myLado='b';
+  if(reto.status==='FINISHED')showResult();
+  else if(reto.status==='ACTIVE')showLive();
+  else if(reto.status==='OPEN'&&!myLado)showAccept();
+  else{show('sl');document.getElementById('sl').innerHTML='<p style="color:var(--m2);text-align:center;padding-top:60px">Esperando a que tu amigo acepte...</p>';}
+  socket.emit('join-reto',RID);
+  socket.on('reto-update',function(r){reto=r;if(r.status==='FINISHED')showResult();else{updScore(r);renderEvs(r.events_log||[]);}});
+  socket.on('minute',function(d){if(d.matchId===reto.match_id){const el=document.getElementById('lmin');if(el)el.textContent='Min '+d.minute+"' · En vivo";}});
+}
+
+function showAccept(){
+  show('sa');
+  const pa=reto.player_a;
+  document.getElementById('rname').textContent=pa.nombre||'Tu rival';
+  document.getElementById('rpills').innerHTML=(pa.jugadores||[]).map(id=>'<span style="background:rgba(255,77,109,.1);color:var(--r);border:1px solid rgba(255,77,109,.3);border-radius:20px;padding:3px 10px;font-size:12px">'+pname(id)+'</span>').join('');
+  renderPool();
+}
+function renderPool(){
+  const takenA=reto.player_a&&reto.player_a.jugadores||[];
+  document.getElementById('pool').innerHTML=PLAYERS.map(p=>{
+    const s=mySel.includes(p.id),t=takenA.includes(p.id);
+    return '<div class="player-row'+(s?' sel':'')+(t?' taken':'')+'" onclick="tog(''+p.id+'')">'+
+      '<div style="display:flex;align-items:center"><span class="pos">'+p.pos+'</span><span>'+p.name+'</span></div>'+
+      '<div style="display:flex;align-items:center;gap:8px"><span class="rat'+(p.r>=8?' hi':'')+'">'+p.r+'</span>'+(s?'<span class="sbadge">OK</span>':'')+'</div></div>';
+  }).join('');
+  document.getElementById('btnA').disabled=mySel.length!==3;
+}
+function tog(id){if(mySel.includes(id))mySel=mySel.filter(x=>x!==id);else if(mySel.length<3)mySel.push(id);renderPool();}
+async function aceptar(){
+  const nombre=document.getElementById('myname').value.trim()||'Amigo';
+  const btn=document.getElementById('btnA');btn.disabled=true;btn.textContent='Aceptando...';
+  const res=await fetch(BASE+'/reto/'+RID+'/aceptar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jugadores:mySel,nombre})});
+  const d=await res.json();
+  if(!res.ok){alert(d.error);btn.disabled=false;btn.textContent='ACEPTAR EL RETO';return;}
+  myToken=d.userToken;myLado='b';
+  localStorage.setItem('rt_'+RID,myToken);
+  const r2=await fetch(BASE+'/reto/'+RID+'/data');reto=await r2.json();showLive();
+}
+
+function showLive(){
+  show('slive');
+  const mk=myLado==='a'?'player_a':'player_b',fk=myLado==='a'?'player_b':'player_a';
+  document.getElementById('lnme').textContent=(reto[mk]&&reto[mk].nombre||'TÚ').toUpperCase();
+  document.getElementById('lnfr').textContent=(reto[fk]&&reto[fk].nombre||'RIVAL').toUpperCase();
+  updScore(reto);renderEvs(reto.events_log||[]);
+}
+function updScore(r){
+  const mk=myLado==='a'?'player_a':'player_b',fk=myLado==='a'?'player_b':'player_a';
+  const pm=r[mk]&&r[mk].pts||0,pf=r[fk]&&r[fk].pts||0;
+  document.getElementById('lme').textContent=pm;document.getElementById('lfr').textContent=pf;
+  const tot=Math.max(Math.abs(pm)+Math.abs(pf),1);
+  const rat=Math.max(10,Math.min(90,50+((pm-pf)/(tot*.5))*40));
+  document.getElementById('lf').style.width=rat+'%';
+}
+function renderEvs(evs){
+  const log=document.getElementById('elog');
+  const mj=(myLado==='a'?reto.player_a:reto.player_b)&&(myLado==='a'?reto.player_a:reto.player_b).jugadores||[];
+  const rel=evs.filter(e=>mj.includes(e.jugador_id)||(myLado==='a'?reto.player_b:reto.player_a)&&(myLado==='a'?reto.player_b:reto.player_a).jugadores&&(myLado==='a'?reto.player_b:reto.player_a).jugadores.includes(e.jugador_id));
+  log.innerHTML=rel.slice().reverse().map(e=>{
+    const mine=mj.includes(e.jugador_id);
+    const tc=e.tipo==='goal'?'gol':e.tipo==='redCard'?'roja':'';
+    return '<div class="ev '+tc+'"><div class="emin">'+e.min+"'</div><div style='flex:1'><div class='eact'>"+ftype(e.tipo)+'</div><div class="epla">'+e.nombre+' <span style="color:var(--m)">'+(mine?'(Tú)':'(Rival)')+'</span></div></div><div class="epts '+(e.pts>=0?'p':'n')+'">'+(e.pts>=0?'+':'')+e.pts+' pts</div></div>';
+  }).join('');
+}
+
+function showResult(){
+  show('sr');
+  const mk=myLado==='a'?'player_a':'player_b',fk=myLado==='a'?'player_b':'player_a';
+  const pm=reto[mk]&&reto[mk].pts||0,pf=reto[fk]&&reto[fk].pts||0,d=pm-pf;
+  const t=document.getElementById('rtit');
+  if(d>0){t.textContent='GANASTE';t.className='rt w';}
+  else if(d<0){t.textContent='PERDISTE';t.className='rt l';}
+  else{t.textContent='EMPATE';t.className='rt d';}
+  document.getElementById('rdiff').textContent=d!==0?'Por '+Math.abs(d)+' puntos':'Misma puntuación';
+  const jm=reto[mk]&&reto[mk].jugadores||[],jf=reto[fk]&&reto[fk].jugadores||[];
+  const bd=document.getElementById('rbd');
+  bd.innerHTML='<div class="bdr bdrh"><div style="font-size:10px;color:var(--g)">TUS JUGADORES</div><div></div><div style="font-size:10px;color:var(--r)">RIVAL</div></div>'+
+    jm.map((id,i)=>{
+      const em=(reto.events_log||[]).filter(e=>e.jugador_id===id).reduce((s,e)=>s+e.pts,0);
+      const ef=(reto.events_log||[]).filter(e=>e.jugador_id===jf[i]).reduce((s,e)=>s+e.pts,0);
+      return '<div class="bdr"><div class="bdn">'+pname(id)+'</div><div class="bdm">'+(em>=0?'+':'')+em+' vs '+(ef>=0?'+':'')+ef+'</div><div class="bdn">'+pname(jf[i]||'')+'</div></div>';
+    }).join('')+
+    '<div class="bdr bdrh"><div class="bdpm">'+(pm>=0?'+':'')+pm+' pts</div><div class="bdm">TOTAL</div><div class="bdpf">'+(pf>=0?'+':'')+pf+' pts</div></div>';
+}
+function compartir(){
+  const pm=reto[myLado==='a'?'player_a':'player_b']&&reto[myLado==='a'?'player_a':'player_b'].pts||0;
+  const pf=reto[myLado==='a'?'player_b':'player_a']&&reto[myLado==='a'?'player_b':'player_a'].pts||0;
+  const msg='SportReto ⚽ '+reto.match_label+'\n'+(pm>pf?'Gané':pm<pf?'Perdí':'Empate')+' — '+pm+' vs '+pf+' pts\n\n¿Me retas? → '+window.location.href;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+init();
+</script>
+</body>
+</html>
