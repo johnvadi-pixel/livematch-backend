@@ -341,22 +341,65 @@ function localDate(timestamp) {
 }
 
 // ── Búsqueda ─────────────────────────────────────────────────────
+// ── Alias de selecciones nacionales y ligas ──────────────────────
+const SEARCH_ALIASES = {
+  'colombia': ['dimayor', 'águilas', 'bucaramanga', 'santa fe', 'cúcuta', 'tolima', 'cali', 'jaguares', 'valledupar', 'chicó'],
+  'argentina': ['argentina', 'afa'],
+  'brasil': ['brazil', 'brasileirao', 'serie a bra'],
+  'brazil': ['brazil', 'brasileirao'],
+  'mexico': ['mexico', 'liga mx', 'liga de expansion'],
+  'perú': ['peru', 'liga 1'],
+  'peru': ['peru', 'liga 1'],
+  'chile': ['chile', 'primera division'],
+  'ecuador': ['ecuador', 'liga pro'],
+  'uruguay': ['uruguay', 'liga auf'],
+  'venezuela': ['venezuela', 'liga futve'],
+  'paraguay': ['paraguay', 'division profesional'],
+  'bolivia': ['bolivia', 'division profesional bol'],
+  'españa': ['laliga', 'spain', 'primera division esp'],
+  'spain': ['laliga', 'spain'],
+  'inglaterra': ['premier league', 'england', 'championship'],
+  'england': ['premier league', 'england'],
+  'alemania': ['bundesliga', 'germany'],
+  'germany': ['bundesliga', 'germany'],
+  'italia': ['serie a', 'italy'],
+  'italy': ['serie a'],
+  'francia': ['ligue 1', 'france'],
+  'france': ['ligue 1', 'france'],
+  'portugal': ['liga portugal', 'portugal'],
+  'usa': ['mls', 'usa', 'usl'],
+  'estados unidos': ['mls', 'usa'],
+  'japón': ['j1 league', 'j league'],
+  'japon': ['j1 league', 'j league'],
+  'corea': ['k league', 'korea'],
+};
+
+function expandQuery(q) {
+  const ql = q.toLowerCase().trim();
+  const aliases = SEARCH_ALIASES[ql];
+  if (aliases) return [ql, ...aliases];
+  return [ql];
+}
+
 function doSearch() {
   const q = document.getElementById('search-input').value.trim();
   if (!q) return;
   state.lastQuery = q;
   document.getElementById('results-list').innerHTML = '<div class="loading">Buscando…</div>';
 
+  const queryTerms = expandQuery(q);
+
   // Primero consultar /api/matches/today y filtrar localmente
   fetch(BACKEND_URL + '/api/matches/today')
     .then(r => r.json())
     .then(data => {
       const all = data.matches || [];
-      const ql = q.toLowerCase();
       const filtered = all.filter(m =>
-        (m.homeTeam?.name || '').toLowerCase().includes(ql) ||
-        (m.awayTeam?.name || '').toLowerCase().includes(ql) ||
-        (m.competition || '').toLowerCase().includes(ql)
+        queryTerms.some(ql =>
+          (m.homeTeam?.name || '').toLowerCase().includes(ql) ||
+          (m.awayTeam?.name || '').toLowerCase().includes(ql) ||
+          (m.competition || '').toLowerCase().includes(ql)
+        )
       );
       if (filtered.length > 0) {
         renderResults(filtered, q);
