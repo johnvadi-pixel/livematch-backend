@@ -82,11 +82,96 @@ io.on('connection', (socket) => {
       const today = new Date().toISOString().split('T')[0];
       const todayMatches = await sofascore.getMatchesByDate(today);
       const q = query.trim().toLowerCase();
-      const filtered = todayMatches.filter(m =>
-        (m.homeTeam?.name || '').toLowerCase().includes(q) ||
-        (m.awayTeam?.name || '').toLowerCase().includes(q) ||
-        (m.competition || '').toLowerCase().includes(q)
-      );
+      const // Mapa de países (español/inglés) a nombres de selecciones y palabras clave
+      const NATIONAL_MAP = {
+        'argentina': ['argentina'],
+        'brasil': ['brazil','brasil'], 'brazil': ['brazil','brasil'],
+        'colombia': ['colombia'],
+        'mexico': ['mexico','méxico'], 'méxico': ['mexico','méxico'],
+        'españa': ['spain','españa'], 'spain': ['spain','españa'],
+        'francia': ['france','francia'], 'france': ['france','francia'],
+        'alemania': ['germany','alemania'], 'germany': ['germany','alemania'],
+        'italia': ['italy','italia'], 'italy': ['italy','italia'],
+        'portugal': ['portugal'],
+        'inglaterra': ['england','inglaterra'], 'england': ['england','inglaterra'],
+        'holanda': ['netherlands','holanda','holland'], 'netherlands': ['netherlands','holanda'],
+        'belgica': ['belgium','bélgica','belgica'], 'belgium': ['belgium','bélgica'],
+        'uruguay': ['uruguay'],
+        'chile': ['chile'],
+        'peru': ['peru','perú'], 'perú': ['peru','perú'],
+        'ecuador': ['ecuador'],
+        'venezuela': ['venezuela'],
+        'paraguay': ['paraguay'],
+        'bolivia': ['bolivia'],
+        'estados unidos': ['usa','united states'], 'usa': ['usa','united states'],
+        'canada': ['canada','canadá'], 'canadá': ['canada','canadá'],
+        'costa rica': ['costa rica'],
+        'panama': ['panama','panamá'], 'panamá': ['panama','panamá'],
+        'jamaica': ['jamaica'],
+        'marruecos': ['morocco','marruecos'], 'morocco': ['morocco','marruecos'],
+        'senegal': ['senegal'],
+        'nigeria': ['nigeria'],
+        'ghana': ['ghana'],
+        'camerun': ['cameroon','camerún'], 'cameroon': ['cameroon','camerún'],
+        'costa de marfil': ['ivory coast','cote d'ivoire'],
+        'egipto': ['egypt','egipto'], 'egypt': ['egypt','egipto'],
+        'japon': ['japan','japón'], 'japan': ['japan','japón'],
+        'corea': ['south korea','korea','corea'], 'korea': ['south korea','korea'],
+        'australia': ['australia'],
+        'iran': ['iran','irán'], 'irán': ['iran','irán'],
+        'arabia saudita': ['saudi arabia'], 'saudi': ['saudi arabia'],
+        'turquia': ['turkey','turquía'], 'turkey': ['turkey','turquía'],
+        'croacia': ['croatia','croacia'], 'croatia': ['croatia','croacia'],
+        'serbia': ['serbia'],
+        'dinamarca': ['denmark','dinamarca'], 'denmark': ['denmark','dinamarca'],
+        'suecia': ['sweden','suecia'], 'sweden': ['sweden','suecia'],
+        'noruega': ['norway','noruega'], 'norway': ['norway','noruega'],
+        'suiza': ['switzerland','suiza'], 'switzerland': ['switzerland','suiza'],
+        'austria': ['austria'],
+        'polonia': ['poland','polonia'], 'poland': ['poland','polonia'],
+        'ucrania': ['ukraine','ucrania'], 'ukraine': ['ukraine','ucrania'],
+        'rumania': ['romania','rumania'], 'romania': ['romania','rumania'],
+        'hungria': ['hungary','hungría'], 'hungary': ['hungary','hungría'],
+        'escocia': ['scotland','escocia'], 'scotland': ['scotland','escocia'],
+        'gales': ['wales','gales'], 'wales': ['wales','gales'],
+        'irlanda': ['ireland','irlanda'], 'ireland': ['ireland','irlanda'],
+        'grecia': ['greece','grecia'], 'greece': ['greece','grecia'],
+        'republica checa': ['czech republic','czechia'],
+        'eslovakia': ['slovakia','eslovaquia'], 'slovakia': ['slovakia'],
+        'albania': ['albania'], 'georgia': ['georgia'],
+        'qatar': ['qatar'], 'emiratos': ['uae','emirates'],
+        'china': ['china'], 'india': ['india'],
+        'sudafrica': ['south africa','sudáfrica'], 'south africa': ['south africa'],
+        'tunez': ['tunisia','túnez'], 'tunisia': ['tunisia'],
+        'argelia': ['algeria','argelia'], 'algeria': ['algeria'],
+        'cameroun': ['cameroon'], 'mali': ['mali'], 'guinea': ['guinea'],
+        'selecciones': ['national','nations league','eliminatorias','world cup','copa america','euro','conmebol','concacaf','africa cup','afcon','qualifier','international'],
+        'eliminatorias': ['qualifier','eliminatorias','world cup qualifier'],
+        'nations league': ['nations league'],
+        'copa america': ['copa america','copa américа'],
+        'eurocopa': ['euro','european championship'],
+        'mundial': ['world cup','fifa world cup']
+      };
+      // Build expanded search terms
+      const searchTerms = [q];
+      if (NATIONAL_MAP[q]) { searchTerms.push(...NATIONAL_MAP[q]); }
+      // Also check if query matches any key and add its values
+      Object.keys(NATIONAL_MAP).forEach(key => {
+        if (key.includes(q) || q.includes(key)) {
+          searchTerms.push(...NATIONAL_MAP[key]);
+        }
+      });
+      const matchesSearch = (m) => {
+        const home = (m.homeTeam?.name || '').toLowerCase();
+        const away = (m.awayTeam?.name || '').toLowerCase();
+        const comp = (m.competition || '').toLowerCase();
+        const country = (m.homeTeam?.country || m.awayTeam?.country || '').toLowerCase();
+        return searchTerms.some(term =>
+          home.includes(term) || away.includes(term) ||
+          comp.includes(term) || country.includes(term)
+        );
+      };
+      filtered = todayMatches.filter(matchesSearch);
       if (filtered.length > 0) {
         callback?.(filtered);
         socket.emit('search-results', filtered);
