@@ -1,7 +1,7 @@
 {
   "name": "livematch-backend",
-  "version": "1.0.0",
-  "description": "Backend en tiempo real para tablero de fÃÂºtbol en vivo",
+  "version": "1.1.0",
+  "description": "Backend en tiempo real para tablero de fÃÂÃÂºtbol en vivo",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
